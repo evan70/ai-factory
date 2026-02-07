@@ -51,17 +51,24 @@ Based on choice:
 
 **If plan file exists → continue to Step 0.1**
 
-### Step 0.1: Load Project Context
+### Step 0.1: Load Project Context & Past Experience
 
 **Read `.ai-factory/DESCRIPTION.md`** if it exists to understand:
 - Tech stack (language, framework, database, ORM)
 - Project architecture and conventions
 - Non-functional requirements
 
+**Read all patches from `.ai-factory/patches/`** if the directory exists:
+- Use `Glob` to find all `*.md` files in `.ai-factory/patches/`
+- Read each patch to learn from past fixes and mistakes
+- Apply lessons learned: avoid patterns that caused bugs, use patterns that prevented them
+- Pay attention to **Root Cause** and **Prevention** sections — they tell you what NOT to do
+
 **Use this context when implementing:**
 - Follow the specified tech stack
 - Use correct import patterns and conventions
 - Apply proper error handling and logging as specified
+- **Avoid pitfalls documented in patches** — don't repeat past mistakes
 
 ### Step 0.1: Find Plan File
 

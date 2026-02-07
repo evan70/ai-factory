@@ -83,16 +83,20 @@ Then open Claude Code and start working:
                │  No git branch   │            │ Full features   │  │ Bug fixes    │
                │  Quick work      │            │ Git branch      │  │ No plans     │
                │                  │            │ Full plan       │  │ With logging │
-               └────────┬─────────┘            └────────┬────────┘  └──────────────┘
-                        │                               │                   ▲
+               └────────┬─────────┘            └────────┬────────┘  └───────┬──────┘
                         │                               │                   │
-                        └───────────────┬───────────────┘                   │
+                        │                               │                   ▼
+                        │                               │          ┌──────────────────┐
+                        │                               │          │ .ai-factory/     │
+                        │                               │          │   patches/       │
+                        │                               │          │ Self-improvement │
+                        └───────────────┬───────────────┘          └────────┬─────────┘
                                         │                                   │
                                         ▼                                   │
                              ┌─────────────────────┐                        │
-                             │                     │                        │
-                             │ /ai-factory.implement│                       │
-                             │                     │ ──── error? ───────────┘
+                             │                     │◀── reads patches ──────┘
+                             │ /ai-factory.implement│
+                             │                     │ ──── error? ──▶ /fix
                              │  Execute tasks      │
                              │  Commit checkpoints │
                              │                     │
@@ -174,6 +178,7 @@ Executes the plan:
 /ai-factory.implement 5      # Start from task #5
 /ai-factory.implement status # Check progress
 ```
+- **Reads past patches** from `.ai-factory/patches/` before starting — learns from previous mistakes
 - Finds plan file (.ai-factory/PLAN.md or branch-based)
 - Executes tasks one by one
 - Prompts for commits at checkpoints
@@ -187,7 +192,8 @@ Quick bug fix without plans:
 - Investigates codebase to find root cause
 - Applies fix WITH logging (`[FIX]` prefix for easy filtering)
 - Suggests test coverage for the bug
-- NO plans, NO reports - just fix and move on
+- Creates a **self-improvement patch** in `.ai-factory/patches/`
+- NO plans, NO reports - just fix, learn, and move on
 
 ### `/ai-factory.commit`
 Creates conventional commits:
@@ -307,9 +313,54 @@ your-project/
 ├── .ai-factory/               # AI Factory working directory
 │   ├── DESCRIPTION.md         # Project specification
 │   ├── PLAN.md                # Current plan (from /task)
-│   └── feature-*.md           # Feature plans (from /feature)
+│   ├── feature-*.md           # Feature plans (from /feature)
+│   └── patches/               # Self-improvement patches (from /fix)
+│       └── 2026-02-07-14.30.md
 └── .ai-factory.json           # AI Factory config
 ```
+
+## Self-Improvement Patches
+
+AI Factory has a built-in learning loop. Every bug fix creates a **patch** — a structured knowledge artifact that helps AI avoid the same mistakes in the future.
+
+```
+/fix → finds bug → fixes it → creates patch → next /fix or /implement reads all patches → better code
+```
+
+**How it works:**
+
+1. `/ai-factory.fix` fixes a bug and creates a patch file in `.ai-factory/patches/YYYY-MM-DD-HH.mm.md`
+2. Each patch documents: **Problem**, **Root Cause**, **Solution**, **Prevention**, and **Tags**
+3. Before any `/fix` or `/implement`, AI reads all existing patches
+4. AI applies lessons learned — avoids patterns that caused bugs, follows patterns that prevented them
+
+**Example patch** (`.ai-factory/patches/2026-02-07-14.30.md`):
+
+```markdown
+# Null reference in UserProfile when user has no avatar
+
+**Date:** 2026-02-07 14:30
+**Files:** src/components/UserProfile.tsx
+**Severity:** medium
+
+## Problem
+TypeError: Cannot read property 'url' of undefined when rendering UserProfile.
+
+## Root Cause
+`user.avatar` is optional in DB but accessed without null check.
+
+## Solution
+Added optional chaining: `user.avatar?.url` with fallback.
+
+## Prevention
+- Always null-check optional DB fields in UI
+- Add "empty state" test cases
+
+## Tags
+`#null-check` `#react` `#optional-field`
+```
+
+The more you use `/fix`, the smarter AI becomes on your project. Patches accumulate and create a project-specific knowledge base.
 
 ## Best Practices
 
