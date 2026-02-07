@@ -113,7 +113,18 @@ Then open Claude Code and start working:
                         │                               │
                         ▼                               ▼
                    More work?                        Done!
-                   Loop back ↑
+                   Loop back ↑                          │
+                                                        ▼
+                                             ┌─────────────────────┐
+                                             │                     │
+                                             │ /ai-factory.evolve  │
+                                             │                     │
+                                             │ Reads patches +     │
+                                             │ project context     │
+                                             │       ↓             │
+                                             │ Improves skills     │
+                                             │                     │
+                                             └─────────────────────┘
 
 ```
 
@@ -194,6 +205,20 @@ Quick bug fix without plans:
 - Suggests test coverage for the bug
 - Creates a **self-improvement patch** in `.ai-factory/patches/`
 - NO plans, NO reports - just fix, learn, and move on
+
+### `/ai-factory.evolve [skill-name|"all"]`
+Self-improve skills based on project experience:
+```
+/ai-factory.evolve          # Evolve all skills
+/ai-factory.evolve fix      # Evolve only /fix skill
+/ai-factory.evolve all      # Evolve all skills
+```
+- Reads all patches from `.ai-factory/patches/` — finds recurring problems
+- Analyzes project tech stack, conventions, and codebase patterns
+- Identifies gaps in existing skills (missing guards, tech-specific pitfalls)
+- Proposes targeted improvements with user approval
+- Saves evolution log to `.ai-factory/evolutions/`
+- The more `/fix` patches you accumulate, the smarter `/evolve` becomes
 
 ### `/ai-factory.commit`
 Creates conventional commits:
@@ -315,8 +340,10 @@ your-project/
 │   ├── PLAN.md                # Current plan (from /task)
 │   ├── features/              # Feature plans (from /feature)
 │   │   └── feature-*.md
-│   └── patches/               # Self-improvement patches (from /fix)
-│       └── 2026-02-07-14.30.md
+│   ├── patches/               # Self-improvement patches (from /fix)
+│   │   └── 2026-02-07-14.30.md
+│   └── evolutions/            # Evolution logs (from /evolve)
+│       └── 2026-02-08-10.00.md
 └── .ai-factory.json           # AI Factory config
 ```
 
@@ -362,6 +389,14 @@ Added optional chaining: `user.avatar?.url` with fallback.
 ```
 
 The more you use `/fix`, the smarter AI becomes on your project. Patches accumulate and create a project-specific knowledge base.
+
+**Periodic evolution** -- run `/ai-factory.evolve` to analyze all patches and automatically improve skills:
+
+```
+/ai-factory.evolve      # Analyze patches + project → improve all skills
+```
+
+This closes the full learning loop: **fix → patch → evolve → better skills → fewer bugs → smarter fixes**.
 
 ## Best Practices
 

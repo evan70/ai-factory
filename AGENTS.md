@@ -26,6 +26,7 @@ ai-factory/
 │   ├── task/               # Create implementation plan
 │   ├── implement/          # Execute plan tasks
 │   ├── fix/                # Quick bug fixes (no plans)
+│   ├── evolve/             # Self-improve skills based on context
 │   ├── commit/             # Conventional commits
 │   ├── review/             # Code review
 │   ├── deploy/             # Deployment helper
@@ -117,7 +118,7 @@ Offers to delete PLAN.md when done (keeps feature-*.md)
 
 /ai-factory.fix <bug description>
     ↓
-Reads .ai-factory/DESCRIPTION.md for context
+Reads .ai-factory/DESCRIPTION.md + patches for context
     ↓
 Investigates codebase (Glob, Grep, Read)
     ↓
@@ -125,7 +126,23 @@ Implements fix WITH logging ([FIX] prefix)
     ↓
 Suggests test coverage for the bug
     ↓
+Creates self-improvement patch in .ai-factory/patches/
+    ↓
 NO plans, NO reports
+
+/ai-factory.evolve [skill-name|"all"]
+    ↓
+Reads .ai-factory/DESCRIPTION.md + all patches
+    ↓
+Analyzes recurring patterns and tech-specific pitfalls
+    ↓
+Reads current skills → identifies gaps
+    ↓
+Proposes targeted improvements → user approves
+    ↓
+Applies improvements to skills
+    ↓
+Saves evolution log to .ai-factory/evolutions/
 ```
 
 ## Skill Frontmatter Patterns
