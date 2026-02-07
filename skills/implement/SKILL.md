@@ -78,7 +78,7 @@ Based on choice:
 1. .ai-factory/PLAN.md exists? → Use it (direct /task call)
 2. No .ai-factory/PLAN.md → Check current git branch:
    git branch --show-current
-   → Look for .ai-factory/<branch-name>.md (e.g., .ai-factory/feature-user-auth.md)
+   → Look for .ai-factory/features/<branch-name>.md (e.g., .ai-factory/features/feature-user-auth.md)
 ```
 
 **Priority:**
@@ -225,7 +225,7 @@ When all tasks are done:
 All 8 tasks completed.
 
 Branch: feature/product-search
-Plan file: .ai-factory/feature-product-search.md
+Plan file: .ai-factory/features/feature-product-search.md
 Files modified:
 - src/services/search.ts (created)
 - src/api/products/search.ts (created)
@@ -244,7 +244,7 @@ Ready to commit? Use:
   - [ ] No, keep it
   ```
 
-- **If branch-named file** (e.g., `.ai-factory/feature-user-auth.md`):
+- **If branch-named file** (e.g., `.ai-factory/features/feature-user-auth.md`):
   - Keep it - documents what was done
   - User can delete before merging if desired
 
@@ -347,7 +347,7 @@ Session 1:
   → Creates branch: feature/user-authentication
   → Asks about tests (No), logging (Verbose)
   → /ai-factory.task creates 6 tasks
-  → Saves plan to: .ai-factory/feature-user-authentication.md
+  → Saves plan to: .ai-factory/features/feature-user-authentication.md
   → /ai-factory.implement starts
   → Completes tasks #1, #2, #3
   → User ends session
@@ -355,7 +355,7 @@ Session 1:
 Session 2:
   /ai-factory.implement
   → Detects branch: feature/user-authentication
-  → Reads plan: .ai-factory/feature-user-authentication.md
+  → Reads plan: .ai-factory/features/feature-user-authentication.md
   → Loads state: 3/6 complete
   → Continues from task #4
   → Completes tasks #4, #5, #6

@@ -48,7 +48,7 @@ ai-factory/
 All AI Factory files in user projects go to `.ai-factory/`:
 - `.ai-factory/DESCRIPTION.md` - project specification
 - `.ai-factory/PLAN.md` - task plan (from /task)
-- `.ai-factory/feature-*.md` - feature plans (from /feature)
+- `.ai-factory/features/feature-*.md` - feature plans (from /feature)
 
 ### Skill Naming
 All skills use `ai-factory.` namespace prefix:
@@ -87,7 +87,7 @@ Creates git branch (feature/xxx)
     ↓
 Asks: tests? logging level?
     ↓
-Calls /ai-factory.task → creates .ai-factory/feature-xxx.md
+Calls /ai-factory.task → creates .ai-factory/features/feature-xxx.md
 
 /ai-factory.task <description>
     ↓
@@ -97,7 +97,7 @@ Explores codebase
     ↓
 Creates tasks with TaskCreate
     ↓
-Saves plan to .ai-factory/PLAN.md (direct) or .ai-factory/feature-xxx.md (from feature)
+Saves plan to .ai-factory/PLAN.md (direct) or .ai-factory/features/feature-xxx.md (from feature)
     ↓
 For 5+ tasks: includes commit checkpoints
 

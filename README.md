@@ -122,7 +122,7 @@ Then open Claude Code and start working:
 | Command | Use Case | Creates Branch? | Creates Plan? |
 |---------|----------|-----------------|---------------|
 | `/ai-factory.task` | Small tasks, quick fixes, experiments | No | `.ai-factory/PLAN.md` |
-| `/ai-factory.feature` | Full features, stories, epics | Yes | `.ai-factory/<branch>.md` |
+| `/ai-factory.feature` | Full features, stories, epics | Yes | `.ai-factory/features/<branch>.md` |
 | `/ai-factory.fix` | Bug fixes, errors, hotfixes | No | No (direct fix) |
 
 ### Why Spec-Driven?
@@ -229,7 +229,7 @@ AI Factory uses markdown files to track implementation plans:
 | Source | Plan File | After Completion |
 |--------|-----------|------------------|
 | `/ai-factory.task` (direct) | `.ai-factory/PLAN.md` | Offer to delete |
-| `/ai-factory.feature` | `.ai-factory/<branch-name>.md` | Keep (user decides) |
+| `/ai-factory.feature` | `.ai-factory/features/<branch-name>.md` | Keep (user decides) |
 
 **Example plan file:**
 
@@ -313,7 +313,8 @@ your-project/
 ├── .ai-factory/               # AI Factory working directory
 │   ├── DESCRIPTION.md         # Project specification
 │   ├── PLAN.md                # Current plan (from /task)
-│   ├── feature-*.md           # Feature plans (from /feature)
+│   ├── features/              # Feature plans (from /feature)
+│   │   └── feature-*.md
 │   └── patches/               # Self-improvement patches (from /fix)
 │       └── 2026-02-07-14.30.md
 └── .ai-factory.json           # AI Factory config

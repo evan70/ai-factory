@@ -34,7 +34,7 @@ git rev-parse --is-inside-work-tree 2>/dev/null || git init
 
 **Determine plan file name:**
 
-1. **If called from `/ai-factory.feature`** - use the plan file name passed (e.g., `.ai-factory/feature-user-auth.md`)
+1. **If called from `/ai-factory.feature`** - use the plan file name passed (e.g., `.ai-factory/features/feature-user-auth.md`)
 
 2. **If called directly (`/ai-factory.task`)** - ALWAYS use `.ai-factory/PLAN.md`
    - Do NOT check current branch
@@ -154,7 +154,12 @@ Created: [date]
 - Group logically related tasks into one commit
 - Suggest meaningful commit messages following conventional commits
 
-Save to: `.ai-factory/PLAN.md` (direct call) or `.ai-factory/<branch-name>.md` (from /feature)
+**Before saving, ensure directory exists:**
+```bash
+mkdir -p .ai-factory/features  # only when saving to features/
+```
+
+Save to: `.ai-factory/PLAN.md` (direct call) or `.ai-factory/features/<branch-name>.md` (from /feature)
 
 ### Step 8: Confirm Plan
 

@@ -94,7 +94,7 @@ If branch already exists, ask user:
 
 ```
 Branch: feature/user-authentication
-Plan file: .ai-factory/feature-user-authentication.md (NOT .ai-factory/PLAN.md!)
+Plan file: .ai-factory/features/feature-user-authentication.md (NOT .ai-factory/PLAN.md!)
 ```
 
 Convert branch name to filename:
@@ -107,7 +107,7 @@ Call `/ai-factory.task` with explicit context:
 /ai-factory.task $ARGUMENTS
 
 CONTEXT FROM /ai-factory.feature:
-- Plan file: .ai-factory/feature-user-authentication.md (use this name, NOT .ai-factory/PLAN.md)
+- Plan file: .ai-factory/features/feature-user-authentication.md (use this name, NOT .ai-factory/PLAN.md)
 - Testing: yes/no
 - Logging: verbose/standard/minimal
 ```
@@ -116,7 +116,7 @@ CONTEXT FROM /ai-factory.feature:
 
 Pass along:
 - Full feature description
-- **Exact plan file name** (based on branch, e.g., `.ai-factory/feature-user-authentication.md`)
+- **Exact plan file name** (based on branch, e.g., `.ai-factory/features/feature-user-authentication.md`)
 - Testing preference
 - Logging preference
 - Any constraints
@@ -124,7 +124,7 @@ Pass along:
 The plan file allows resuming work based on current git branch:
 ```bash
 git branch --show-current  # → feature/user-authentication
-# → Look for .ai-factory/feature-user-authentication.md
+# → Look for .ai-factory/features/feature-user-authentication.md
 ```
 
 ## Examples
