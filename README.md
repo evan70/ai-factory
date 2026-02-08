@@ -435,6 +435,8 @@ All implementations include verbose, configurable logging:
 }
 ```
 
+![happy](https://github.com/lee-to/ai-factory/raw/main/art/happy.png)
+
 ## Links
 
 - [skills.sh](https://skills.sh) - Skill marketplace
