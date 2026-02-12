@@ -3,7 +3,7 @@ name: ai-factory.fix
 description: Fix a specific bug or problem in the codebase. Analyzes code to find and fix issues without creating plans. Use when user reports a bug, error, or something not working. Always suggests test coverage and adds logging.
 argument-hint: <bug description or error message>
 allowed-tools: Read Write Edit Glob Grep Bash AskUserQuestion
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Fix - Quick Bug Fix Workflow

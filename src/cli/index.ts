@@ -1,13 +1,14 @@
 import { Command } from 'commander';
 import { initCommand } from './commands/init.js';
 import { updateCommand } from './commands/update.js';
+import { getCurrentVersion } from '../core/config.js';
 
 const program = new Command();
 
 program
   .name('ai-factory')
-  .description('CLI tool for automating Claude Code context setup')
-  .version('1.2.0');
+  .description('CLI tool for automating AI agent context setup')
+  .version(getCurrentVersion());
 
 program
   .command('init')

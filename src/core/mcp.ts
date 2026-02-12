@@ -1,5 +1,6 @@
 import path from 'path';
 import { readJsonFile, writeJsonFile, getMcpDir, ensureDir, fileExists } from '../utils/fs.js';
+import { getAgentConfig } from './agents.js';
 
 interface McpServerConfig {
   command: string;
@@ -11,19 +12,22 @@ interface McpSettings {
   mcpServers?: Record<string, McpServerConfig>;
 }
 
-const CLAUDE_SETTINGS_DIR = '.claude';
-const SETTINGS_LOCAL_FILE = 'settings.local.json';
-
 export interface McpOptions {
   github: boolean;
   filesystem: boolean;
   postgres: boolean;
 }
 
-export async function configureMcp(projectDir: string, options: McpOptions): Promise<string[]> {
+export async function configureMcp(projectDir: string, options: McpOptions, agentId: string = 'claude'): Promise<string[]> {
+  const agent = getAgentConfig(agentId);
+
+  if (!agent.supportsMcp || !agent.settingsFile) {
+    return [];
+  }
+
   const configuredServers: string[] = [];
-  const settingsDir = path.join(projectDir, CLAUDE_SETTINGS_DIR);
-  const settingsPath = path.join(settingsDir, SETTINGS_LOCAL_FILE);
+  const settingsPath = path.join(projectDir, agent.settingsFile);
+  const settingsDir = path.dirname(settingsPath);
 
   await ensureDir(settingsDir);
 

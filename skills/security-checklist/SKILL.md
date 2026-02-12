@@ -25,7 +25,7 @@ Comprehensive security checklist based on OWASP Top 10 (2021) and industry best 
 Run the automated security audit script:
 
 ```bash
-bash ~/.claude/skills/security-checklist/scripts/audit.sh
+bash ~/{{skills_dir}}/security-checklist/scripts/audit.sh
 ```
 
 This checks:

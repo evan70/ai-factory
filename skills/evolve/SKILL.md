@@ -69,10 +69,10 @@ Scan the project for patterns:
 **Read each target skill's SKILL.md:**
 
 ```
-Glob: .claude/skills/*/SKILL.md
+Glob: {{skills_dir}}/*/SKILL.md
 ```
 
-If skills are not installed yet (no `.claude/skills/`), read from source:
+If skills are not installed yet (no `{{skills_dir}}/`), read from source:
 ```
 Glob: skills/*/SKILL.md
 ```

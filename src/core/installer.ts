@@ -1,17 +1,21 @@
 import path from 'path';
 import { copyDirectory, getSkillsDir, ensureDir, listDirectories } from '../utils/fs.js';
 import type { AiFactoryConfig } from './config.js';
+import { getAgentConfig } from './agents.js';
+import { processSkillTemplates } from './template.js';
 
 export interface InstallOptions {
   projectDir: string;
   skillsDir: string;
   skills: string[];
   stack: string | null;
+  agentId: string;
 }
 
 export async function installSkills(options: InstallOptions): Promise<string[]> {
-  const { projectDir, skillsDir, skills, stack } = options;
+  const { projectDir, skillsDir, skills, stack, agentId } = options;
   const installedSkills: string[] = [];
+  const agentConfig = getAgentConfig(agentId);
 
   const targetDir = path.join(projectDir, skillsDir);
   await ensureDir(targetDir);
@@ -24,6 +28,7 @@ export async function installSkills(options: InstallOptions): Promise<string[]> 
 
     try {
       await copyDirectory(sourceSkillDir, targetSkillDir);
+      await processSkillTemplates(targetSkillDir, agentConfig);
       installedSkills.push(skill);
     } catch (error) {
       console.warn(`Warning: Could not install skill "${skill}": ${error}`);
@@ -39,6 +44,7 @@ export async function installSkills(options: InstallOptions): Promise<string[]> 
         const targetSkillDir = path.join(targetDir, templateSkill);
 
         await copyDirectory(sourceDir, targetSkillDir);
+        await processSkillTemplates(targetSkillDir, agentConfig);
         installedSkills.push(`${stack}/${templateSkill}`);
       }
     } catch {
@@ -73,6 +79,7 @@ export async function updateSkills(config: AiFactoryConfig, projectDir: string):
     skillsDir: config.skillsDir,
     skills: availableSkills,
     stack: null,
+    agentId: config.agent,
   });
 
   // Return base skills + preserved custom skills

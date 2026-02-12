@@ -21,6 +21,25 @@ ai-factory init
 - **Spec-driven development** — AI follows plans, not random exploration. Predictable, resumable, reviewable
 - **Community skills** — leverage [skills.sh](https://skills.sh) ecosystem or generate custom skills
 - **Works with your stack** — Next.js, Laravel, Django, Express, and more
+- **Multi-agent support** — Claude Code, Cursor, Codex CLI, GitHub Copilot, Gemini CLI, Junie, or any agent
+
+---
+
+## Supported Agents
+
+AI Factory works with any AI coding agent. During `ai-factory init`, you choose your target agent and skills are installed to the correct directory with paths adapted automatically:
+
+| Agent | Config Directory | Skills Directory |
+|-------|-----------------|-----------------|
+| Claude Code | `.claude/` | `.claude/skills/` |
+| Cursor | `.cursor/` | `.cursor/skills/` |
+| Codex CLI | `.codex/` | `.codex/skills/` |
+| GitHub Copilot | `.github/` | `.github/skills/` |
+| Gemini CLI | `.gemini/` | `.gemini/skills/` |
+| Junie | `.junie/` | `.junie/skills/` |
+| Universal / Other | `.ai/` | `.ai/skills/` |
+
+MCP server configuration is currently supported for Claude Code. Other agents get skills installed with correct paths but without MCP auto-configuration.
 
 ---
 
@@ -47,12 +66,13 @@ ai-factory init
 ```
 
 This will:
+- Ask which AI agent you use (Claude, Cursor, Codex, Copilot, Gemini, Junie, or Universal)
 - Detect your project stack
 - Ask which base skills to install
-- Configure MCP servers (optional)
-- Set up `.claude/skills/` directory
+- Configure MCP servers (for supported agents)
+- Set up skills directory (e.g. `.claude/skills/`, `.codex/skills/`, etc.)
 
-Then open Claude Code and start working:
+Then open your AI agent and start working:
 
 ```
 /ai-factory
@@ -96,6 +116,17 @@ Then open Claude Code and start working:
                                         │                                   │
                                         ▼                                   │
                              ┌─────────────────────┐                        │
+                             │                     │                        │
+                             │ /ai-factory.improve │                        │
+                             │    (optional)        │                        │
+                             │                     │                        │
+                             │ Refine plan with    │                        │
+                             │ deeper analysis     │                        │
+                             │                     │                        │
+                             └──────────┬──────────┘                        │
+                                        │                                   │
+                                        ▼                                   │
+                             ┌─────────────────────┐                        │
                              │                     │◀── reads patches ──────┘
                              │ /ai-factory.implement│
                              │                     │ ──── error? ──▶ /fix
@@ -136,6 +167,7 @@ Then open Claude Code and start working:
 |---------|----------|-----------------|---------------|
 | `/ai-factory.task` | Small tasks, quick fixes, experiments | No | `.ai-factory/PLAN.md` |
 | `/ai-factory.feature` | Full features, stories, epics | Yes | `.ai-factory/features/<branch>.md` |
+| `/ai-factory.improve` | Refine plan before implementation | No | No (improves existing) |
 | `/ai-factory.fix` | Bug fixes, errors, hotfixes | No | No (direct fix) |
 
 ### Why Spec-Driven?
@@ -183,6 +215,20 @@ Creates implementation plan:
 - Creates tasks with dependencies
 - Saves plan to `.ai-factory/PLAN.md` (or branch-named file)
 - For 5+ tasks, includes commit checkpoints
+
+### `/ai-factory.improve [prompt]`
+Refine an existing plan with a second iteration:
+```
+/ai-factory.improve                                    # Auto-review: find gaps, missing tasks, wrong deps
+/ai-factory.improve добавь валидацию и обработку ошибок # Improve based on specific feedback
+```
+- Finds the active plan (`.ai-factory/PLAN.md` or branch-based `features/<branch>.md`)
+- Performs deeper codebase analysis than the initial `/task` planning
+- Finds missing tasks (migrations, configs, middleware)
+- Fixes task dependencies and descriptions
+- Removes redundant tasks
+- Shows improvement report and asks for approval before applying
+- If no plan found — suggests running `/ai-factory.task` or `/ai-factory.feature` first
 
 ### `/ai-factory.implement`
 Executes the plan:
@@ -295,7 +341,88 @@ AI Factory can configure these MCP servers:
 | Postgres | Database queries | `DATABASE_URL` |
 | Filesystem | Advanced file operations | - |
 
-Configuration saved to `.claude/settings.local.json` (gitignored).
+Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, gitignored).
+
+## Security
+
+**Security is a first-class citizen in AI Factory.** Skills downloaded from external sources (skills.sh, GitHub, URLs) can contain prompt injection attacks — malicious instructions hidden inside SKILL.md files that hijack agent behavior, steal credentials, or execute destructive commands.
+
+AI Factory protects against this with a **mandatory two-level security scan** that runs before any external skill is used:
+
+```
+External skill downloaded
+         │
+         ▼
+┌─── Level 1: Automated Scanner ────────────────────────────┐
+│                                                            │
+│  Python-based static analysis (security-scan.py)           │
+│                                                            │
+│  Detects:                                                  │
+│  ✓ Prompt injection patterns                               │
+│    ("ignore previous instructions", fake <system> tags)    │
+│  ✓ Data exfiltration attempts                              │
+│    (curl with .env/secrets, reading ~/.ssh, ~/.aws)        │
+│  ✓ Stealth instructions                                    │
+│    ("do not tell the user", "silently", "secretly")        │
+│  ✓ Destructive commands (rm -rf, fork bombs, disk format)  │
+│  ✓ Config tampering (agent dirs, .bashrc, .gitconfig)      │
+│  ✓ Encoded payloads (base64, hex, zero-width characters)   │
+│  ✓ Social engineering ("authorized by admin")              │
+│  ✓ Hidden HTML comments with suspicious content            │
+│                                                            │
+│  Smart code-block awareness: patterns inside markdown      │
+│  fenced code blocks are demoted to warnings (docs/examples)│
+│                                                            │
+└──────────────────────┬─────────────────────────────────────┘
+                       │ CLEAN/WARNINGS?
+                       ▼
+┌─── Level 2: LLM Semantic Review ──────────────────────────┐
+│                                                            │
+│  The AI agent reads all skill files and evaluates:         │
+│                                                            │
+│  ✓ Does every instruction serve the skill's stated purpose?│
+│  ✓ Are there requests to access sensitive user data?       │
+│  ✓ Is there anything unrelated to the skill's goal?        │
+│  ✓ Are there manipulation attempts via urgency/authority?  │
+│  ✓ Subtle rephrasing of known attacks that regex misses    │
+│  ✓ "Does this feel right?" — a linter asking for network   │
+│    access, a formatter reading SSH keys, etc.              │
+│                                                            │
+└──────────────────────┬─────────────────────────────────────┘
+                       │ Both levels pass?
+                       ▼
+                ✅ Skill is safe to use
+```
+
+**Why two levels?**
+
+| Level | Catches | Misses |
+|-------|---------|--------|
+| **Python scanner** | Known patterns, encoded payloads, invisible characters, HTML comment injections | Rephrased attacks, novel techniques |
+| **LLM semantic review** | Intent and context, creative rephrasing, suspicious tool combinations | Encoded data, zero-width chars, binary payloads |
+
+They complement each other — the scanner is deterministic and catches what LLMs might skip over; the LLM understands meaning and catches what regex can't express.
+
+**Scan results:**
+- **CLEAN** (exit 0) — no threats, safe to install
+- **BLOCKED** (exit 1) — critical threats detected, skill is deleted and user is warned
+- **WARNINGS** (exit 2) — suspicious patterns found, user must explicitly confirm
+
+A skill with **any CRITICAL threat is never installed**. No exceptions, no overrides.
+
+### Running the scanner manually
+
+```bash
+# Scan a skill directory (use your agent's skills path)
+python3 .claude/skills/skill-generator/scripts/security-scan.py ./my-downloaded-skill/
+
+# Scan a single SKILL.md file
+python3 .claude/skills/skill-generator/scripts/security-scan.py ./my-skill/SKILL.md
+
+# For other agents, adjust the path accordingly:
+# python3 .codex/skills/skill-generator/scripts/security-scan.py ./my-skill/
+# python3 .ai/skills/skill-generator/scripts/security-scan.py ./my-skill/
+```
 
 ## Skill Acquisition Strategy
 
@@ -305,11 +432,14 @@ AI Factory follows this strategy for skills:
 For each recommended skill:
   1. Search skills.sh: npx skills search <name>
   2. If found → Install: npx skills install <name>
-  3. If not found → Generate: /ai-factory.skill-generator <name>
-  4. Has reference docs? → Learn: /ai-factory.skill-generator <url1> [url2]...
+  3. Security scan → python3 security-scan.py <path>
+     - BLOCKED? → remove, warn user, skip
+     - WARNINGS? → show to user, ask confirmation
+  4. If not found → Generate: /ai-factory.skill-generator <name>
+  5. Has reference docs? → Learn: /ai-factory.skill-generator <url1> [url2]...
 ```
 
-**Never reinvent existing skills** - always check skills.sh first. When reference documentation is available, use **Learn Mode** to generate skills from real sources.
+**Never reinvent existing skills** - always check skills.sh first. **Never trust external skills blindly** - always scan before use. When reference documentation is available, use **Learn Mode** to generate skills from real sources.
 
 ## CLI Commands
 
@@ -323,20 +453,21 @@ ai-factory update
 
 ## Project Structure
 
-After initialization:
+After initialization (example for Claude Code — other agents use their own directory):
 
 ```
 your-project/
-├── .claude/
+├── .claude/                   # Agent config dir (varies: .cursor/, .codex/, .ai/, etc.)
 │   ├── skills/
 │   │   ├── ai-factory/
 │   │   ├── feature/
 │   │   ├── task/
+│   │   ├── improve/
 │   │   ├── implement/
 │   │   ├── commit/
 │   │   ├── review/
 │   │   └── skill-generator/
-│   └── settings.local.json    # MCP config (gitignored)
+│   └── settings.local.json    # MCP config (Claude only, gitignored)
 ├── .ai-factory/               # AI Factory working directory
 │   ├── DESCRIPTION.md         # Project specification
 │   ├── PLAN.md                # Current plan (from /task)
@@ -423,10 +554,10 @@ All implementations include verbose, configurable logging:
 `.ai-factory.json`:
 ```json
 {
-  "version": "1.2.0",
+  "version": "1.0.0",
   "agent": "claude",
   "skillsDir": ".claude/skills",
-  "installedSkills": ["ai-factory", "feature", "task", "implement", "commit"],
+  "installedSkills": ["ai-factory", "feature", "task", "improve", "implement", "commit"],
   "mcp": {
     "github": true,
     "postgres": false,
@@ -435,13 +566,19 @@ All implementations include verbose, configurable logging:
 }
 ```
 
+The `agent` field can be any supported agent ID: `claude`, `cursor`, `codex`, `copilot`, `gemini`, `junie`, or `universal`. The `skillsDir` is set automatically based on the chosen agent.
+
 ![happy](https://github.com/lee-to/ai-factory/raw/main/art/happy.png)
 
 ## Links
 
 - [skills.sh](https://skills.sh) - Skill marketplace
 - [Agent Skills Spec](https://agentskills.io) - Skill specification
-- [Claude Code](https://claude.ai/code) - AI coding assistant
+- [Claude Code](https://claude.ai/code) - Anthropic's AI coding agent
+- [Cursor](https://cursor.com) - AI-powered code editor
+- [Codex CLI](https://github.com/openai/codex) - OpenAI's coding agent
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google's coding agent
+- [Junie](https://www.jetbrains.com/junie/) - JetBrains' AI coding agent
 
 ## License
 
