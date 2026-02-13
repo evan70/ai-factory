@@ -39,7 +39,7 @@ AI Factory works with any AI coding agent. During `ai-factory init`, you choose 
 | Junie | `.junie/` | `.junie/skills/` |
 | Universal / Other | `.ai/` | `.ai/skills/` |
 
-MCP server configuration is currently supported for Claude Code. Other agents get skills installed with correct paths but without MCP auto-configuration.
+MCP server configuration is supported for Claude Code and Cursor. Other agents get skills installed with correct paths but without MCP auto-configuration.
 
 ---
 
@@ -341,7 +341,7 @@ AI Factory can configure these MCP servers:
 | Postgres | Database queries | `DATABASE_URL` |
 | Filesystem | Advanced file operations | - |
 
-Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, gitignored).
+Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, `.cursor/mcp.json` for Cursor, gitignored).
 
 ## Security
 
@@ -467,7 +467,7 @@ your-project/
 │   │   ├── commit/
 │   │   ├── review/
 │   │   └── skill-generator/
-│   └── settings.local.json    # MCP config (Claude only, gitignored)
+│   └── settings.local.json    # MCP config (Claude/Cursor, gitignored)
 ├── .ai-factory/               # AI Factory working directory
 │   ├── DESCRIPTION.md         # Project specification
 │   ├── PLAN.md                # Current plan (from /task)

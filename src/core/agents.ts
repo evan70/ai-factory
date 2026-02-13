@@ -21,8 +21,8 @@ const AGENT_REGISTRY: Record<string, AgentConfig> = {
     displayName: 'Cursor',
     configDir: '.cursor',
     skillsDir: '.cursor/skills',
-    settingsFile: null,
-    supportsMcp: false,
+    settingsFile: '.cursor/mcp.json',
+    supportsMcp: true,
   },
   codex: {
     id: 'codex',
