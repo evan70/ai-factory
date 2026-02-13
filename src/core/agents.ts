@@ -67,8 +67,8 @@ const AGENT_REGISTRY: Record<string, AgentConfig> = {
   universal: {
     id: 'universal',
     displayName: 'Universal / Other',
-    configDir: '.ai',
-    skillsDir: '.ai/skills',
+    configDir: '.agents',
+    skillsDir: '.agents/skills',
     settingsFile: null,
     supportsMcp: false,
   },

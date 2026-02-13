@@ -43,7 +43,7 @@ ai-factory/
 
 ### Skills Location
 - **Package skills**: `skills/` - source of truth, copied during install
-- **User skills**: `.claude/skills/` (Claude Code), `.opencode/skills/` (OpenCode), or `.ai/skills/` (universal)
+- **User skills**: `.claude/skills/` (Claude Code), `.opencode/skills/` (OpenCode), or `.agents/skills/` (universal)
 
 ### Working Directory
 All AI Factory files in user projects go to `.ai-factory/`:

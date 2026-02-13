@@ -38,7 +38,7 @@ AI Factory works with any AI coding agent. During `ai-factory init`, you choose 
 | GitHub Copilot | `.github/` | `.github/skills/` |
 | Gemini CLI | `.gemini/` | `.gemini/skills/` |
 | Junie | `.junie/` | `.junie/skills/` |
-| Universal / Other | `.ai/` | `.ai/skills/` |
+| Universal / Other | `.agents/` | `.agents/skills/` |
 
 MCP server configuration is supported for Claude Code, Cursor, and OpenCode. Other agents get skills installed with correct paths but without MCP auto-configuration.
 
@@ -448,7 +448,7 @@ python3 .claude/skills/skill-generator/scripts/security-scan.py ./my-skill/SKILL
 
 # For other agents, adjust the path accordingly:
 # python3 .codex/skills/skill-generator/scripts/security-scan.py ./my-skill/
-# python3 .ai/skills/skill-generator/scripts/security-scan.py ./my-skill/
+# python3 .agents/skills/skill-generator/scripts/security-scan.py ./my-skill/
 ```
 
 ## Skill Acquisition Strategy
