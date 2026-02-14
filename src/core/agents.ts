@@ -80,6 +80,14 @@ const AGENT_REGISTRY: Record<string, AgentConfig> = {
     settingsFile: null,
     supportsMcp: false,
   },
+  kilocode: {
+    id: 'kilocode',
+    displayName: 'Kilo Code',
+    configDir: '.kilocode',
+    skillsDir: '.kilocode/skills',
+    settingsFile: '.kilocode/mcp.json',
+    supportsMcp: true,
+  },
   opencode: {
     id: 'opencode',
     displayName: 'OpenCode',

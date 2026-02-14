@@ -21,7 +21,7 @@ ai-factory init
 - **Spec-driven development** — AI follows plans, not random exploration. Predictable, resumable, reviewable
 - **Community skills** — leverage [skills.sh](https://skills.sh) ecosystem or generate custom skills
 - **Works with your stack** — Next.js, Laravel, Django, Express, and more
-- **Multi-agent support** — Claude Code, Cursor, Windsurf, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, or any agent
+- **Multi-agent support** — Claude Code, Cursor, Windsurf, Kilo Code, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, or any agent
 
 ---
 
@@ -34,6 +34,7 @@ AI Factory works with any AI coding agent. During `ai-factory init`, you choose 
 | Claude Code | `.claude/` | `.claude/skills/` |
 | Cursor | `.cursor/` | `.cursor/skills/` |
 | Windsurf | `.windsurf/` | `.windsurf/skills/` |
+| Kilo Code | `.kilocode/` | `.kilocode/skills/` |
 | OpenCode | `.opencode/` | `.opencode/skills/` |
 | Warp | `.warp/` | `.warp/skills/` |
 | Zencoder | `.zencoder/` | `.zencoder/skills/` |
@@ -43,7 +44,7 @@ AI Factory works with any AI coding agent. During `ai-factory init`, you choose 
 | Junie | `.junie/` | `.junie/skills/` |
 | Universal / Other | `.agents/` | `.agents/skills/` |
 
-MCP server configuration is supported for Claude Code, Cursor, and OpenCode. Other agents get skills installed with correct paths but without MCP auto-configuration.
+MCP server configuration is supported for Claude Code, Cursor, Kilo Code, and OpenCode. Other agents get skills installed with correct paths but without MCP auto-configuration.
 
 ---
 
@@ -70,7 +71,7 @@ ai-factory init
 ```
 
 This will:
-- Ask which AI agent you use (Claude, Cursor, Windsurf, OpenCode, Warp, Zencoder, Codex, Copilot, Gemini, Junie, or Universal)
+- Ask which AI agent you use (Claude, Cursor, Windsurf, Kilo Code, OpenCode, Warp, Zencoder, Codex, Copilot, Gemini, Junie, or Universal)
 - Detect your project stack
 - Ask which base skills to install
 - Configure MCP servers (for supported agents)
@@ -371,7 +372,7 @@ AI Factory can configure these MCP servers:
 | Postgres | Database queries | `DATABASE_URL` |
 | Filesystem | Advanced file operations | - |
 
-Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, `.cursor/mcp.json` for Cursor, `opencode.json` for OpenCode, gitignored).
+Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, `.cursor/mcp.json` for Cursor, `.kilocode/mcp.json` for Kilo Code, `opencode.json` for OpenCode, gitignored).
 
 ## Security
 
@@ -597,7 +598,7 @@ All implementations include verbose, configurable logging:
 }
 ```
 
-The `agent` field can be any supported agent ID: `claude`, `cursor`, `windsurf`, `opencode`, `warp`, `zencoder`, `codex`, `copilot`, `gemini`, `junie`, or `universal`. The `skillsDir` is set automatically based on the chosen agent.
+The `agent` field can be any supported agent ID: `claude`, `cursor`, `windsurf`, `kilocode`, `opencode`, `warp`, `zencoder`, `codex`, `copilot`, `gemini`, `junie`, or `universal`. The `skillsDir` is set automatically based on the chosen agent.
 
 ![happy](https://github.com/lee-to/ai-factory/raw/main/art/happy.png)
 
@@ -608,6 +609,7 @@ The `agent` field can be any supported agent ID: `claude`, `cursor`, `windsurf`,
 - [Claude Code](https://claude.ai/code) - Anthropic's AI coding agent
 - [Cursor](https://cursor.com) - AI-powered code editor
 - [OpenCode](https://opencode.ai) - Open-source AI coding agent
+- [Kilo Code](https://kilo.ai) - Open-source agentic coding platform
 - [Windsurf](https://windsurf.com) - AI-powered code editor by Codeium
 - [Warp](https://www.warp.dev) - Intelligent terminal with AI agent
 - [Zencoder](https://zencoder.ai) - AI coding agent for VS Code and JetBrains
