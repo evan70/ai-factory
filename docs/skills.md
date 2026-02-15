@@ -154,6 +154,37 @@ Generates and maintains project documentation:
 - Technical review — verifies links, structure, code examples, no content loss
 - Readability review — "new user eyes" checklist: is it clear, scannable, jargon-free?
 
+### `/ai-factory.dockerize [--audit]`
+Generates, enhances, or audits Docker configuration for your project:
+```
+/ai-factory.dockerize          # Auto-detect mode based on existing files
+/ai-factory.dockerize --audit  # Force audit mode on existing Docker files
+```
+
+**Three modes** (auto-detected):
+1. **Generate** — no Docker files exist → interactive setup (choose DB, reverse proxy, cache), then create everything from scratch
+2. **Enhance** — only local Docker exists (no production files) → audit & improve local, then create production config with deploy scripts
+3. **Audit** — full Docker setup exists → run security checklist, fix gaps, add missing best practices
+
+**Generated file structure:**
+- Root: `Dockerfile`, `compose.yml`, `compose.override.yml`, `compose.production.yml`, `.dockerignore`, `.env.example` — only files Docker expects by convention
+- `docker/` — service configs (angie/, postgres/, php/, redis/) — only directories that are needed
+- `deploy/scripts/` — 6 production ops scripts: deploy, update, logs, health-check, rollback, backup (with tiered retention)
+
+**Interactive setup** — when generating from scratch, asks about infrastructure: database (PostgreSQL, MySQL, MongoDB), reverse proxy (Angie preferred over Nginx, Traefik), cache (Redis, Memcached), queue (RabbitMQ).
+
+**Security audit** — production checklist (OWASP Docker Security Cheat Sheet):
+- Container isolation (read-only, no-new-privileges, cap_drop, non-root, tmpfs)
+- Port exposure (no ports on infrastructure in prod, only proxy exposes 80/443)
+- Network security (internal backend, no host networking, no Docker socket)
+- Health checks on every service, log rotation, stdout/stderr logging
+- Resource limits (CPU, memory, PIDs), secrets management, image pinning
+- Over-engineering check (don't add services the code doesn't use)
+
+After completion, suggests `/ai-factory.build-automation` and `/ai-factory.docs`.
+
+Supports Go, Node.js, Python, and PHP with framework-specific configurations.
+
 ### `/ai-factory.build-automation [makefile|taskfile|justfile|mage]`
 Generates or enhances build automation files:
 ```

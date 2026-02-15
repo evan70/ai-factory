@@ -46,6 +46,7 @@ your-project/
 │   │   ├── improve/
 │   │   ├── implement/
 │   │   ├── commit/
+│   │   ├── dockerize/
 │   │   ├── build-automation/
 │   │   ├── verify/
 │   │   ├── docs/
