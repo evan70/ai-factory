@@ -1,8 +1,8 @@
 ---
 name: ai-factory.feature
-description: Start a new feature development. Creates a git branch with a logical name based on feature description, then invokes /ai-factory.task to create an implementation plan. Use when user says "new feature", "start feature", "implement feature", or "add feature".
+description: End-to-end feature development. Creates git branch, plans implementation via /ai-factory.task, then executes via /ai-factory.implement — full cycle without manual steps. Use when user says "new feature", "start feature", "implement feature", or "add feature".
 argument-hint: [--parallel | --list | --cleanup <branch>] <feature description>
-allowed-tools: Bash(git *) Read Write Skill AskUserQuestion
+allowed-tools: Bash(git *) Bash(cd *) Bash(cp *) Bash(mkdir *) Bash(basename *) Read Write Skill AskUserQuestion
 disable-model-invocation: true
 ---
 
@@ -177,9 +177,13 @@ fi
 mkdir -p "${WORKTREE}/.ai-factory/features"
 ```
 
-#### 4f. Output instructions to user
+#### 4f. Switch to worktree and continue
 
-Display the following message so the user knows how to start working in the new worktree:
+```bash
+cd "${WORKTREE}"
+```
+
+Display a brief confirmation:
 
 ```
 ✅ Parallel worktree created!
@@ -187,23 +191,12 @@ Display the following message so the user knows how to start working in the new 
   Branch:    <branch-name>
   Directory: <worktree-path>
 
-To start working on this feature:
-
-  cd <worktree-path>
-  claude
-
-Then inside Claude Code:
-
-  /ai-factory.task <feature description>
-
-To see all active worktrees:
+To manage worktrees later:
   /ai-factory.feature --list
-
-To clean up when done:
   /ai-factory.feature --cleanup <branch-name>
 ```
 
-**STOP here** — do NOT continue to Step 5. The user will invoke `/ai-factory.task` themselves in the new worktree's Claude Code session.
+**Continue to Step 5** — invoke `/ai-factory.task` in the worktree directory to start planning immediately.
 
 ### Step 4 (Normal): Create Branch
 
@@ -257,6 +250,27 @@ The plan file allows resuming work based on current git branch:
 ```bash
 git branch --show-current  # → feature/user-authentication
 # → Look for .ai-factory/features/feature-user-authentication.md
+```
+
+### Step 6: Next Action (depends on mode)
+
+**Parallel mode (`--parallel`):** Automatically invoke `/ai-factory.implement` — the whole point of parallel is autonomous end-to-end execution in an isolated worktree.
+
+```
+/ai-factory.implement
+
+CONTEXT FROM /ai-factory.feature:
+- Plan file: .ai-factory/features/<branch-name>.md
+- Testing: yes/no
+- Logging: verbose/standard/minimal
+- Docs: yes/no
+```
+
+**Normal mode:** STOP after planning. The user reviews the plan and decides when to implement.
+
+```
+Plan created! To start implementation:
+/ai-factory.implement
 ```
 
 ## --list Subcommand
@@ -316,7 +330,8 @@ If the worktree path doesn't exist, check `git worktree list` and suggest the co
 2. Generate branch: `feature/user-authentication`
 3. Ask about testing preference
 4. Create branch: `git checkout -b feature/user-authentication`
-5. Call: `/ai-factory.task Add user authentication with email/password and OAuth`
+5. Call `/ai-factory.task` → creates plan, user reviews
+6. STOP — user runs `/ai-factory.implement` when ready
 
 **User:** `/ai-factory.feature --parallel Add Stripe checkout integration`
 
@@ -328,7 +343,9 @@ If the worktree path doesn't exist, check `git worktree list` and suggest the co
 5. Create branch: `git branch feature/stripe-checkout main`
 6. Create worktree: `git worktree add ../my-project-feature-stripe-checkout feature/stripe-checkout`
 7. Copy context files (.ai-factory/DESCRIPTION.md, .ai-factory/patches/, .claude/, CLAUDE.md if untracked)
-8. Output instructions to user — STOP
+8. `cd` into worktree
+9. Call `/ai-factory.task` → creates plan, user reviews
+10. Auto-invoke `/ai-factory.implement` → executes the plan (parallel = autonomous)
 
 **User:** `/ai-factory.feature --list`
 
@@ -352,7 +369,8 @@ If the worktree path doesn't exist, check `git worktree list` and suggest the co
 2. Generate branch: `fix/cart-quantity-update`
 3. Ask about testing
 4. Create branch
-5. Call `/ai-factory.task`
+5. Call `/ai-factory.task` → creates plan, user reviews
+6. STOP — user runs `/ai-factory.implement` when ready
 
 ## Important
 
