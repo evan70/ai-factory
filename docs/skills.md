@@ -212,6 +212,42 @@ Generates or enhances build automation files:
 
 Supports Go, Node.js, Python, and PHP with framework-specific targets (Laravel artisan, Next.js, FastAPI, etc.).
 
+### `/ai-factory.ci [github|gitlab] [--enhance]`
+Generates, enhances, or audits CI/CD pipeline configuration:
+```
+/ai-factory.ci                   # Auto-detect platform and mode
+/ai-factory.ci github            # Generate GitHub Actions workflow
+/ai-factory.ci gitlab            # Generate GitLab CI pipeline
+/ai-factory.ci --enhance         # Force enhance mode on existing CI
+```
+
+**Three modes** (auto-detected):
+1. **Generate** — no CI config exists → asks which platform (GitHub/GitLab), optional features (security, coverage, matrix), then creates pipeline from scratch
+2. **Enhance** — CI exists but incomplete → analyzes gaps (missing lint/SA/security jobs), adds missing jobs
+3. **Audit** — full CI setup exists → audits against best practices, reports issues, fixes gaps
+
+**One workflow per concern** — separate files, not a monolith:
+- `lint.yml` — code-style, static analysis, rector (PHPStan, ESLint, Clippy, golangci-lint)
+- `tests.yml` — test suite with optional matrix builds and service containers
+- `build.yml` — compilation/bundling verification
+- `security.yml` — dependency audit + dependency review (composer audit, govulncheck, cargo deny)
+
+**Per-language tools detected automatically:**
+- **PHP**: PHP-CS-Fixer/Pint/PHPCS, PHPStan/Psalm, Rector, PHPUnit/Pest
+- **Python**: Ruff/Black+isort+Flake8, mypy, pytest, bandit (supports both uv and pip)
+- **Node.js/TypeScript**: ESLint/Prettier/Biome, tsc, Jest/Vitest
+- **Go**: golangci-lint, go test, govulncheck
+- **Rust**: cargo fmt, clippy, cargo test, cargo audit/deny
+- **Java**: Checkstyle/PMD/SpotBugs, JUnit, OWASP (Maven and Gradle)
+
+**CI best practices** built-in:
+- Concurrency groups, `fail-fast: false`, dependency caching per language
+- GitLab: `policy: pull` on downstream jobs, codequality/junit report integration, DAG with `needs:`
+- GitHub: explicit `permissions`, `actions/dependency-review-action` for PR security
+- Service containers (PostgreSQL, Redis) when tests need external dependencies
+
+After completion, suggests `/ai-factory.build-automation` and `/ai-factory.dockerize`.
+
 ### `/ai-factory.commit`
 Creates conventional commits:
 - Analyzes staged changes

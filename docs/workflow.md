@@ -178,7 +178,7 @@ Reads all accumulated patches, analyzes project patterns, and proposes targeted 
 
 ---
 
-For full details on all skills including utility commands (`/ai-factory.docs`, `/ai-factory.dockerize`, `/ai-factory.build-automation`, `/ai-factory.commit`, `/ai-factory.verify`, `/ai-factory.skill-generator`, `/ai-factory.security-checklist`), see [Core Skills](skills.md).
+For full details on all skills including utility commands (`/ai-factory.docs`, `/ai-factory.dockerize`, `/ai-factory.build-automation`, `/ai-factory.ci`, `/ai-factory.commit`, `/ai-factory.verify`, `/ai-factory.skill-generator`, `/ai-factory.security-checklist`), see [Core Skills](skills.md).
 
 ## Why Spec-Driven?
 

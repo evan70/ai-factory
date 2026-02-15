@@ -65,6 +65,9 @@ Then open your AI agent and start working:
 # Fix a bug — AI learns from every fix and gets smarter over time
 /ai-factory.fix TypeError: Cannot read property 'name' of undefined
 
+# Set up CI pipeline — GitHub Actions or GitLab CI with linting, SA, tests
+/ai-factory.ci github
+
 # Generate project documentation — README + docs/ with topics
 /ai-factory.docs
 ```
