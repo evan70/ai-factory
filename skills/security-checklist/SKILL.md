@@ -842,3 +842,5 @@ grep -rn "innerHTML.*llm\|innerHTML.*response\|innerHTML.*completion" --include=
 | Missing Rate Limit | 🟡 Medium | < 2 weeks |
 | Verbose Errors | 🟡 Medium | < 2 weeks |
 | Missing Headers | 🟢 Low | < 1 month |
+
+> **Tip:** Context is heavy after security audit. Consider `/clear` or `/compact` before continuing with other tasks.

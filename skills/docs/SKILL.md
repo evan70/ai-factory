@@ -688,6 +688,19 @@ Read `AGENTS.md` and find the `## Documentation` section. Update it to reflect t
 - Keep descriptions concise (under 10 words)
 - If `AGENTS.md` doesn't exist, skip this step silently
 
+### Context Cleanup
+
+Context is heavy after codebase scanning and documentation generation. All docs are saved — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
+```
+
 ## Important Rules
 
 1. **Always ask before making changes** to existing documentation — show the plan first

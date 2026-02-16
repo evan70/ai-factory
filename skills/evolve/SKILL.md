@@ -216,6 +216,19 @@ Improvements applied: Y
    `/ai-factory.skill-generator <skill-name>`
 ```
 
+### Context Cleanup
+
+Context is heavy after reading all patches and skills. All improvements are saved — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
+```
+
 ## What Each Skill Can Learn
 
 | Skill | Learns From | Example Enhancement |

@@ -286,6 +286,19 @@ Ready to implement:
 /ai-factory.implement
 ```
 
+### Context Cleanup
+
+Context is heavy after deep codebase analysis. Plan is updated in file — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
+```
+
 ## Important Rules
 
 1. **Don't rewrite from scratch** — improve the existing plan, don't replace it

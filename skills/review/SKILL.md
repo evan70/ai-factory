@@ -109,3 +109,5 @@ If GitHub MCP is configured, can:
 - Post review comments directly to PR
 - Request changes or approve
 - Add labels based on review outcome
+
+> **Tip:** Context is heavy after code review. Consider `/clear` or `/compact` before continuing with other tasks.

@@ -287,6 +287,19 @@ To view tasks:
 /tasks (or use TaskList)
 ```
 
+### Context Cleanup
+
+Context is heavy after planning. All results are saved to the plan file — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
+```
+
 ## Plan File Handling
 
 **`.ai-factory/PLAN.md`** (direct `/ai-factory.task` call):

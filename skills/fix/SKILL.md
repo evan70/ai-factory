@@ -416,6 +416,19 @@ default avatar URL. Also added a null check in the Avatar sub-component.
 
 **This is NOT optional.** Every fix generates a patch. The patch is your learning.
 
+### Context Cleanup
+
+Context is heavy after investigation, fix, and patch generation. All results are saved — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
+```
+
 ---
 
 **DO NOT:**

@@ -235,10 +235,19 @@ What's next?
 
 1. 🔍 /ai-factory.verify — Verify nothing was missed (recommended)
 2. 💾 /ai-factory.commit — Commit the changes directly
+```
 
-> **Tip:** After committing, it's recommended to start a **new session**
-> (or at least run `/clear`) before continuing with other tasks.
-> This frees up context and avoids confusion from the previous implementation.
+### Context Cleanup
+
+Context is heavy after implementation. All code changes are saved — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
 ```
 
 **Suggest verification:**

@@ -273,6 +273,19 @@ Plan created! To start implementation:
 /ai-factory.implement
 ```
 
+### Context Cleanup
+
+Context is heavy after branch creation and planning. All results are saved to the plan file — suggest freeing space:
+
+```
+AskUserQuestion: Free up context before continuing?
+
+Options:
+1. /clear — Full reset (recommended)
+2. /compact — Compress history
+3. Continue as is
+```
+
 ## --list Subcommand
 
 When `--list` is passed, show all active worktrees and their feature status. Then **STOP** — do not continue the normal workflow.
