@@ -63,20 +63,43 @@ else
         error "Name exceeds 64 characters: ${#NAME} ('$NAME')"
     fi
 
-    if [[ ! "$NAME" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]] && [[ ! "$NAME" =~ ^[a-z0-9]$ ]]; then
-        error "Invalid name format. Must be lowercase, hyphens only, no consecutive hyphens: '$NAME'"
+    # Dotted names (namespaces) like "ai-factory.feature" — valid but not portable across all agents
+    if [[ "$NAME" == *.* ]]; then
+        PARTS_VALID=true
+        IFS='.' read -ra PARTS <<< "$NAME"
+        for part in "${PARTS[@]}"; do
+            if [[ ! "$part" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]] && [[ ! "$part" =~ ^[a-z0-9]$ ]]; then
+                PARTS_VALID=false
+            fi
+            if [[ "$part" =~ -- ]]; then
+                PARTS_VALID=false
+            fi
+        done
+        if [[ "$PARTS_VALID" == true ]]; then
+            warn "Name '$NAME' uses dot namespace — works in Claude Code but may not be supported by all agents"
+        else
+            error "Invalid name format: '$NAME'. Each part (split by dot) must be lowercase with hyphens only"
+        fi
+    else
+        if [[ ! "$NAME" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]] && [[ ! "$NAME" =~ ^[a-z0-9]$ ]]; then
+            error "Invalid name format. Must be lowercase, hyphens only, no consecutive hyphens: '$NAME'"
+        fi
+        if [[ "$NAME" =~ -- ]]; then
+            error "Name contains consecutive hyphens"
+        fi
     fi
 
-    if [[ "$NAME" =~ -- ]]; then
-        error "Name contains consecutive hyphens"
-    fi
-
-    # Check name matches directory
+    # Check name matches directory (for dotted names, compare part after last dot)
     DIR_NAME=$(basename "$(cd "$SKILL_PATH" && pwd)")
-    if [[ "$NAME" != "$DIR_NAME" ]]; then
+    if [[ "$NAME" == *.* ]]; then
+        NAME_SUFFIX="${NAME##*.}"
+    else
+        NAME_SUFFIX="$NAME"
+    fi
+    if [[ "$NAME_SUFFIX" != "$DIR_NAME" ]]; then
         warn "Name '$NAME' doesn't match directory name '$DIR_NAME'"
     else
-        pass "Name '$NAME' is valid and matches directory"
+        pass "Name '$NAME' matches directory"
     fi
 fi
 
