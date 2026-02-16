@@ -80,6 +80,14 @@ const AGENT_REGISTRY: Record<string, AgentConfig> = {
     settingsFile: null,
     supportsMcp: false,
   },
+  roocode: {
+    id: 'roocode',
+    displayName: 'Roo Code',
+    configDir: '.roo',
+    skillsDir: '.roo/skills',
+    settingsFile: '.roo/mcp.json',
+    supportsMcp: true,
+  },
   kilocode: {
     id: 'kilocode',
     displayName: 'Kilo Code',

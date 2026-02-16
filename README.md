@@ -21,7 +21,7 @@ ai-factory init
 - **Spec-driven development** — AI follows plans, not random exploration. Predictable, resumable, reviewable
 - **Community skills** — leverage [skills.sh](https://skills.sh) ecosystem or generate custom skills
 - **Works with your stack** — Next.js, Laravel, Django, Express, and more
-- **Multi-agent support** — Claude Code, Cursor, Windsurf, Kilo Code, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, or [any agent](docs/getting-started.md#supported-agents)
+- **Multi-agent support** — Claude Code, Cursor, Windsurf, Roo Code, Kilo Code, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, or [any agent](docs/getting-started.md#supported-agents)
 
 ---
 
@@ -112,6 +112,7 @@ AI Factory can generate and maintain your project docs with a single command:
 - [Claude Code](https://claude.ai/code) - Anthropic's AI coding agent
 - [Cursor](https://cursor.com) - AI-powered code editor
 - [OpenCode](https://opencode.ai) - Open-source AI coding agent
+- [Roo Code](https://roocode.com) - AI coding agent for VS Code
 - [Kilo Code](https://kilo.ai) - Open-source agentic coding platform
 - [Windsurf](https://windsurf.com) - AI-powered code editor by Codeium
 - [Warp](https://www.warp.dev) - Intelligent terminal with AI agent

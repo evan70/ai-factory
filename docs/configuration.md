@@ -18,7 +18,7 @@
 }
 ```
 
-The `agent` field can be any supported agent ID: `claude`, `cursor`, `windsurf`, `kilocode`, `opencode`, `warp`, `zencoder`, `codex`, `copilot`, `gemini`, `junie`, or `universal`. The `skillsDir` is set automatically based on the chosen agent.
+The `agent` field can be any supported agent ID: `claude`, `cursor`, `windsurf`, `roocode`, `kilocode`, `opencode`, `warp`, `zencoder`, `codex`, `copilot`, `gemini`, `junie`, or `universal`. The `skillsDir` is set automatically based on the chosen agent.
 
 ## MCP Configuration
 
@@ -30,7 +30,7 @@ AI Factory can configure these MCP servers:
 | Postgres | Database queries | `DATABASE_URL` |
 | Filesystem | Advanced file operations | - |
 
-Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, `.cursor/mcp.json` for Cursor, `.kilocode/mcp.json` for Kilo Code, `opencode.json` for OpenCode, gitignored).
+Configuration saved to agent's settings file (e.g. `.claude/settings.local.json` for Claude Code, `.cursor/mcp.json` for Cursor, `.roo/mcp.json` for Roo Code, `.kilocode/mcp.json` for Kilo Code, `opencode.json` for OpenCode, gitignored).
 
 ## Project Structure
 

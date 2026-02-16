@@ -20,6 +20,7 @@ AI Factory works with any AI coding agent. During `ai-factory init`, you choose 
 | Claude Code | `.claude/` | `.claude/skills/` |
 | Cursor | `.cursor/` | `.cursor/skills/` |
 | Windsurf | `.windsurf/` | `.windsurf/skills/` |
+| Roo Code | `.roo/` | `.roo/skills/` |
 | Kilo Code | `.kilocode/` | `.kilocode/skills/` |
 | OpenCode | `.opencode/` | `.opencode/skills/` |
 | Warp | `.warp/` | `.warp/skills/` |
@@ -30,7 +31,7 @@ AI Factory works with any AI coding agent. During `ai-factory init`, you choose 
 | Junie | `.junie/` | `.junie/skills/` |
 | Universal / Other | `.agents/` | `.agents/skills/` |
 
-MCP server configuration is supported for Claude Code, Cursor, Kilo Code, and OpenCode. Other agents get skills installed with correct paths but without MCP auto-configuration.
+MCP server configuration is supported for Claude Code, Cursor, Roo Code, Kilo Code, and OpenCode. Other agents get skills installed with correct paths but without MCP auto-configuration.
 
 ## Your First Project
 
