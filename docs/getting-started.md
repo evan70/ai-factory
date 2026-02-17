@@ -63,6 +63,9 @@ ai-factory init
 
 # Update skills to latest version
 ai-factory update
+
+# Upgrade from v1 to v2 (removes old bare-named skills, installs ai-factory-* prefixed)
+ai-factory upgrade
 ```
 
 ## Next Steps

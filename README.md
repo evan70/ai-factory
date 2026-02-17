@@ -71,6 +71,14 @@ Or running without installation via `npx`:
 npx ai-factory init
 ```
 
+### Upgrading from v1 to v2
+
+```bash
+ai-factory upgrade
+```
+
+This removes old bare-named skills (`commit`, `feature`, etc.) and installs new `ai-factory-*` prefixed versions. Custom skills are preserved.
+
 ### Example Workflow
 
 ```bash

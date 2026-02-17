@@ -4,11 +4,12 @@
 
 ## What is this project?
 
-**AI Factory** is an npm package + skill system that automates Claude Code context setup for projects. It provides:
+**AI Factory** (v2) is an npm package + skill system that automates AI agent context setup for projects. It provides:
 
-1. **CLI tool** (`ai-factory init/update`) - installs skills and configures MCP
-2. **Built-in skills** - workflow commands for spec-driven development
-3. **Spec-driven workflow** - structured approach: plan → implement → commit
+1. **CLI tool** (`ai-factory init/update/upgrade`) — installs skills and configures MCP
+2. **Built-in skills** (18 skills, all `ai-factory-*` prefixed) — workflow commands for spec-driven development
+3. **Spec-driven workflow** — structured approach: plan → implement → commit
+4. **Multi-agent support** — 14 agents (Claude Code, Cursor, Windsurf, Roo Code, Kilo Code, Antigravity, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, Universal)
 
 ## Project Structure
 
@@ -16,26 +17,34 @@
 ai-factory/
 ├── src/                    # CLI source (TypeScript)
 │   ├── cli/
-│   │   ├── commands/       # init.ts, update.ts
+│   │   ├── commands/       # init.ts, update.ts, upgrade.ts
 │   │   └── wizard/         # prompts.ts, detector.ts
-│   ├── core/               # installer.ts, config.ts, mcp.ts
+│   ├── core/               # installer.ts, config.ts, mcp.ts, agents.ts, template.ts, transformer.ts
+│   │   └── transformers/   # default.ts, antigravity.ts, kilocode.ts
 │   └── utils/              # fs.ts
 ├── skills/                 # Built-in skills (copied to user projects)
-│   ├── ai-factory/         # Main setup skill
-│   ├── feature/            # Start feature (branch + plan)
-│   ├── task/               # Create implementation plan
-│   ├── implement/          # Execute plan tasks
-│   ├── fix/                # Quick bug fixes (no plans)
-│   ├── evolve/             # Self-improve skills based on context
-│   ├── commit/             # Conventional commits
-│   ├── docs/               # Documentation generation & maintenance
-│   ├── review/             # Code review
-│   ├── deploy/             # Deployment helper
-│   ├── skill-generator/    # Generate new skills
-│   ├── best-practices/     # Code quality guidelines
-│   ├── architecture/       # Architecture patterns
-│   ├── security-checklist/ # Security audit
-│   └── _templates/         # Stack-specific templates
+│   ├── ai-factory/                    # Main setup skill
+│   ├── ai-factory-architecture/       # Architecture patterns
+│   ├── ai-factory-best-practices/     # Code quality guidelines
+│   ├── ai-factory-build-automation/   # Makefile/Taskfile/Justfile generator
+│   ├── ai-factory-ci/                 # GitHub Actions / GitLab CI generator
+│   ├── ai-factory-commit/             # Conventional commits
+│   ├── ai-factory-deploy/             # Deployment helper
+│   ├── ai-factory-dockerize/          # Docker/compose generator
+│   ├── ai-factory-docs/               # Documentation generation & maintenance
+│   ├── ai-factory-evolve/             # Self-improve skills based on context
+│   ├── ai-factory-feature/            # Start feature (branch + plan)
+│   ├── ai-factory-fix/                # Quick bug fixes (no plans)
+│   ├── ai-factory-implement/          # Execute plan tasks
+│   ├── ai-factory-improve/            # Plan refinement (second iteration)
+│   ├── ai-factory-review/             # Code review
+│   ├── ai-factory-security-checklist/ # Security audit
+│   ├── ai-factory-skill-generator/    # Generate new skills
+│   ├── ai-factory-task/               # Create implementation plan
+│   ├── ai-factory-verify/             # Verify implementation against plan
+│   └── _templates/                    # Stack-specific templates
+├── scripts/                # test-skills.sh
+├── mcp/                    # MCP server templates
 ├── dist/                   # Compiled JS
 └── bin/                    # CLI entry point
 ```
@@ -43,25 +52,28 @@ ai-factory/
 ## Key Concepts
 
 ### Skills Location
-- **Package skills**: `skills/` - source of truth, copied during install
-- **User skills**: `.claude/skills/` (Claude Code), `.opencode/skills/` (OpenCode), or `.agents/skills/` (universal)
+- **Package skills**: `skills/` — source of truth, copied during install
+- **User skills**: `<agent-config-dir>/skills/` (e.g. `.claude/skills/`, `.opencode/skills/`, `.agents/skills/`)
+- **Agent transformer system**: `src/core/transformers/` adapts skill format per agent (e.g. Antigravity uses flat `.md` for workflow skills, KiloCode sanitizes dotted names)
 
 ### Working Directory
 All AI Factory files in user projects go to `.ai-factory/`:
-- `.ai-factory/DESCRIPTION.md` - project specification
-- `.ai-factory/ARCHITECTURE.md` - architecture decisions and guidelines
-- `.ai-factory/PLAN.md` - task plan (from /ai-factory-task)
-- `.ai-factory/features/feature-*.md` - feature plans (from /ai-factory-feature)
+- `.ai-factory/DESCRIPTION.md` — project specification
+- `.ai-factory/ARCHITECTURE.md` — architecture decisions and guidelines
+- `.ai-factory/PLAN.md` — task plan (from /ai-factory-task)
+- `.ai-factory/features/feature-*.md` — feature plans (from /ai-factory-feature)
 
-### Skill Naming
-All skills use `ai-factory-` prefix:
-- `/ai-factory` - main setup
+### Skill Naming (v2)
+All skills use `ai-factory-` prefix (v1 used bare names like `commit`, `feature`):
+- `/ai-factory` — main setup
 - `/ai-factory-feature`
 - `/ai-factory-task`
 - `/ai-factory-implement`
 - `/ai-factory-commit`
 - `/ai-factory-docs`
 - etc.
+
+The `ai-factory upgrade` command migrates from v1 bare names to v2 prefixed names.
 
 ## Workflow Logic
 
@@ -172,6 +184,9 @@ Used by: best-practices, architecture, security-checklist, review
 # Build TypeScript
 npm run build
 
+# Run tests (validates all skills + negative tests + codebase integrity)
+npm test
+
 # Link globally for testing
 npm link
 
@@ -181,17 +196,29 @@ ai-factory init
 
 # Update skills after changes
 ai-factory update
+
+# Upgrade from v1 to v2 (removes old bare-named skills, installs ai-factory-* prefixed)
+ai-factory upgrade
 ```
 
 ## Key Files to Know
 
 | File | Purpose |
 |------|---------|
+| `src/cli/index.ts` | CLI entry point, registers init/update/upgrade commands |
+| `src/cli/commands/init.ts` | Interactive wizard: detect stack, select skills, configure MCP |
+| `src/cli/commands/update.ts` | Re-install all skills, preserve custom skills |
+| `src/cli/commands/upgrade.ts` | v1→v2 migration: remove old bare names, install prefixed |
 | `src/cli/wizard/prompts.ts` | Interactive CLI questions |
 | `src/cli/wizard/detector.ts` | Stack detection logic |
+| `src/core/agents.ts` | Agent registry (14 agents) |
 | `src/core/installer.ts` | Copies skills to project |
 | `src/core/mcp.ts` | MCP server configuration |
-| `skills/*/SKILL.md` | Skill instructions |
+| `src/core/template.ts` | `{{var}}` template substitution in SKILL.md |
+| `src/core/transformer.ts` | AgentTransformer interface + registry |
+| `src/core/transformers/` | Per-agent skill format adapters |
+| `scripts/test-skills.sh` | Test suite (validate + negative tests + integrity) |
+| `skills/ai-factory-*/SKILL.md` | Skill instructions |
 
 ## Important Rules
 
@@ -244,14 +271,16 @@ docs/
 ## Common Changes
 
 ### Adding a new skill
-1. Create `skills/new-skill/SKILL.md`
+1. Create `skills/ai-factory-new-skill/SKILL.md` (must use `ai-factory-` prefix)
 2. Add to `getAvailableSkills()` if needed
 3. Rebuild: `npm run build`
+4. Validate: `npm test`
 
 ### Modifying workflow
 1. Edit relevant skill in `skills/`
 2. Update AGENTS.md if logic changes
 3. Rebuild and test with `ai-factory update`
+4. Validate: `npm test`
 
 ### Adding a new agent
 
@@ -294,11 +323,26 @@ Template variables (`{{config_dir}}`, `{{skills_dir}}`, etc.) in skill `.md` fil
 2. Update types in `src/core/config.ts` if needed
 3. Rebuild: `npm run build`
 
-## Testing Checklist
+## Testing
+
+### Automated tests
+
+```bash
+npm test
+```
+
+Runs `scripts/test-skills.sh` which validates:
+1. **All skills pass validation** — runs `validate.sh` on every `skills/ai-factory-*/`
+2. **Negative tests** — ensures validator correctly rejects: dotted names, name/dir mismatch, missing name, consecutive hyphens, uppercase names, oversized frontmatter, unquoted bracket hints
+3. **Codebase integrity** — no dotted `name: ai-factory.xxx` fields, no dotted `/ai-factory.xxx` invocations in docs
+
+### Manual checklist
 
 After changes, verify:
+- [ ] `npm test` passes
 - [ ] `ai-factory init` works in empty directory
 - [ ] `ai-factory update` updates existing skills
+- [ ] `ai-factory upgrade` migrates v1 → v2 correctly
 - [ ] `/ai-factory` in Claude Code shows interactive stack selection
 - [ ] `/ai-factory-feature` creates branch + plan file
 - [ ] `/ai-factory-implement` finds and executes plan
