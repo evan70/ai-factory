@@ -43,7 +43,7 @@ Read the SKILL.md and all supporting files. Ask: "Does every instruction serve t
 ```
 For each recommended skill:
   1. Search: npx skills search <name>
-  2. If found → Install: npx skills install <name>
+  2. If found → Install: npx skills install {{skills_cli_agent_flag}} <name>
   3. SECURITY: Scan installed skill → python security-scan.py <path>
      - BLOCKED? → rm -rf <path>, warn user, skip this skill
      - WARNINGS? → show to user, ask confirmation
@@ -141,7 +141,7 @@ Proceed? [Y/n]
 2. Save `.ai-factory/DESCRIPTION.md`
 3. For each external skill from skills.sh:
    ```bash
-   npx skills install <name>
+   npx skills install {{skills_cli_agent_flag}} <name>
    # AUTO-SCAN: immediately after install
    python3 ~/{{skills_dir}}/skill-generator/scripts/security-scan.py <installed-path>
    ```

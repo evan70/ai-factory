@@ -93,6 +93,7 @@ def main():
 
     print("\nTo install a skill:")
     print("  npx skills add <owner/repo>")
+    print("  (tip: use --agent <name> to install for a specific agent)")
 
 if __name__ == '__main__':
     main()

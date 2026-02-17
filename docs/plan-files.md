@@ -95,7 +95,7 @@ AI Factory follows this strategy for skills:
 ```
 For each recommended skill:
   1. Search skills.sh: npx skills search <name>
-  2. If found → Install: npx skills install <name>
+  2. If found → Install: npx skills install --agent <agent> <name>
   3. Security scan → python3 security-scan.py <path>
      - BLOCKED? → remove, warn user, skip
      - WARNINGS? → show to user, ask confirmation

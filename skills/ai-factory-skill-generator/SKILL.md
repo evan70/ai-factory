@@ -280,7 +280,7 @@ Or browse https://skills.sh for inspiration. Check if similar skills exist to av
 
 **If you install an external skill at this step** — immediately scan it:
 ```bash
-npx skills install <name>
+npx skills install {{skills_cli_agent_flag}} <name>
 python3 ~/{{skills_dir}}/skill-generator/scripts/security-scan.py <installed-path>
 ```
 If BLOCKED → remove and warn. If WARNINGS → show to user.

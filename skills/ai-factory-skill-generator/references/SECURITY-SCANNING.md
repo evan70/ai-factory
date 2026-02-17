@@ -46,7 +46,7 @@ Install anyway? [y/N]
 
 **When using `npx skills install`:**
 ```
-1. npx skills install <name>         # Downloads skill
+1. npx skills install {{skills_cli_agent_flag}} <name>  # Downloads skill
 2. LEVEL 1: Run automated scan on installed directory
 3. LEVEL 2: Read and review the skill content semantically
 4. If BLOCKED → remove the skill directory and warn user
