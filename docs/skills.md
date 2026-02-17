@@ -30,6 +30,21 @@ Starts a new feature:
 /ai-factory-feature --cleanup feature/stripe-checkout # Remove worktree and branch
 ```
 
+### `/ai-factory-roadmap [check | vision or requirements]`
+Creates or updates a strategic project roadmap:
+```
+/ai-factory-roadmap                              # Analyze project and create roadmap
+/ai-factory-roadmap SaaS for project management  # Create roadmap from vision
+/ai-factory-roadmap                              # Update existing roadmap (interactive)
+/ai-factory-roadmap check                        # Auto-scan codebase, mark done milestones
+```
+- Reads `.ai-factory/DESCRIPTION.md` + `ARCHITECTURE.md` for context
+- **First run** — explores codebase, asks for major goals, generates `.ai-factory/ROADMAP.md`
+- **Subsequent runs** — review progress, add milestones, reprioritize, mark completed
+- **`check`** — automated progress scan: analyzes codebase for evidence of completed milestones, reports done/partial/not started, marks completed with confirmation
+- Milestones are high-level goals (not granular tasks — that's `/ai-factory-task`)
+- `/ai-factory-implement` automatically marks roadmap milestones done when work completes
+
 ### `/ai-factory-task <description>`
 Creates implementation plan:
 ```

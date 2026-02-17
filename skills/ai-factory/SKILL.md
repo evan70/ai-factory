@@ -437,6 +437,7 @@ Skills installed: [list]
 MCP configured: [list]
 
 To start development:
+- /ai-factory-roadmap — Create a strategic roadmap with milestones (recommended for new projects)
 - /ai-factory-feature <description> — Start a new feature (creates branch + plan)
 - /ai-factory-task <description> — Create implementation plan only
 - /ai-factory-implement — Execute existing plan

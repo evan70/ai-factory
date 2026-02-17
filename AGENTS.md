@@ -38,6 +38,7 @@ ai-factory/
 │   ├── ai-factory-implement/          # Execute plan tasks
 │   ├── ai-factory-improve/            # Plan refinement (second iteration)
 │   ├── ai-factory-review/             # Code review
+│   ├── ai-factory-roadmap/            # Strategic project roadmap
 │   ├── ai-factory-security-checklist/ # Security audit
 │   ├── ai-factory-skill-generator/    # Generate new skills
 │   ├── ai-factory-task/               # Create implementation plan
@@ -69,6 +70,7 @@ All skills use `ai-factory-` prefix (v1 used bare names like `commit`, `feature`
 - `/ai-factory-feature`
 - `/ai-factory-task`
 - `/ai-factory-implement`
+- `/ai-factory-roadmap`
 - `/ai-factory-commit`
 - `/ai-factory-docs`
 - etc.
@@ -96,6 +98,15 @@ Check: has arguments? has project files?
 /ai-factory-architecture → Generate ARCHITECTURE.md
     ↓
 STOP (does NOT implement)
+
+/ai-factory-roadmap [vision or requirements]
+    ↓
+Reads .ai-factory/DESCRIPTION.md + ARCHITECTURE.md for context
+    ↓
+First run → explores codebase, asks user for goals → generates .ai-factory/ROADMAP.md
+Subsequent → review progress, add/reprioritize/mark milestones done
+    ↓
+ROADMAP.md = strategic checklist of high-level goals
 
 /ai-factory-feature <description>
     ↓
@@ -130,6 +141,8 @@ Executes tasks one by one
 Updates DESCRIPTION.md if stack changes
     ↓
 Prompts for commits at checkpoints
+    ↓
+Checks .ai-factory/ROADMAP.md → marks completed milestones
     ↓
 Offers to delete PLAN.md when done (keeps feature-*.md)
 
@@ -334,7 +347,7 @@ npm test
 Runs `scripts/test-skills.sh` which validates:
 1. **All skills pass validation** — runs `validate.sh` on every `skills/ai-factory-*/`
 2. **Negative tests** — ensures validator correctly rejects: dotted names, name/dir mismatch, missing name, consecutive hyphens, uppercase names, oversized frontmatter, unquoted bracket hints
-3. **Codebase integrity** — no dotted `name: ai-factory.xxx` fields, no dotted `/ai-factory.xxx` invocations in docs
+3. **Codebase integrity** — no dotted `name:` fields in skills, no dotted slash-command invocations in docs
 
 ### Manual checklist
 

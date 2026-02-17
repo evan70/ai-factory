@@ -256,6 +256,14 @@ What's next?
 2. 💾 /ai-factory-commit — Commit the changes directly
 ```
 
+**Check ROADMAP.md progress:**
+
+If `.ai-factory/ROADMAP.md` exists:
+1. Read it
+2. Check if the completed work corresponds to any unchecked milestone
+3. If yes — mark it `[x]` and add entry to the Completed table with today's date
+4. Tell the user which milestone was marked done
+
 ### Context Cleanup
 
 Context is heavy after implementation. All code changes are saved — suggest freeing space:

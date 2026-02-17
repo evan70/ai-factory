@@ -2,7 +2,7 @@
 
 # Development Workflow
 
-AI Factory provides a set of **workflow skills** that form the core development loop: plan, improve, implement, fix, evolve. Each skill is a step in the pipeline — they connect to each other and share context through plan files and patches.
+AI Factory provides a set of **workflow skills** that form the core development loop: roadmap, plan, improve, implement, fix, evolve. Each skill is a step in the pipeline — they connect to each other and share context through plan files and patches.
 
 ![workflow](https://github.com/lee-to/ai-factory/raw/main/art/workflow.png)
 
@@ -25,7 +25,7 @@ AI Factory provides a set of **workflow skills** that form the core development 
                           ▼                                ▼                ▼
                ┌──────────────────┐            ┌─────────────────┐  ┌──────────────┐
                │                  │            │                 │  │              │
-               │ /ai-factory-task │            │/ai-factory.     │  │/ai-factory.  │
+               │ /ai-factory-task │            │ /ai-factory-    │  │ /ai-factory- │
                │                  │            │    feature      │  │    fix       │
                │  Small tasks     │            │                 │  │              │
                │  No git branch   │            │ Full features   │  │ Bug fixes    │
@@ -63,18 +63,18 @@ AI Factory provides a set of **workflow skills** that form the core development 
                              └──────────┬───────────┘
                                         │
                                         ▼
-                             ┌──────────────────────┐
-                             │                      │
-                             │ /ai-factory-verify   │
-                             │    (optional)        │
-                             │                      │
-                             │ Check completeness   │
-                             │ Build / test / lint   │
-                             │    ↓                 │
-                             │ → /security-checklist│
-                             │ → /review            │
-                             │                      │
-                             └──────────┬───────────┘
+                             ┌──────────────────────────────────────┐
+                             │                                      │
+                             │ /ai-factory-verify                   │
+                             │    (optional)                        │
+                             │                                      │
+                             │ Check completeness                   │
+                             │ Build / test / lint                   │
+                             │    ↓                                 │
+                             │ → /ai-factory-security-checklist     │
+                             │ → /ai-factory-review                 │
+                             │                                      │
+                             └──────────────────┬───────────────────┘
                                         │
                                         ▼
                              ┌─────────────────────┐
@@ -106,6 +106,7 @@ AI Factory provides a set of **workflow skills** that form the core development 
 
 | Command | Use Case | Creates Branch? | Creates Plan? |
 |---------|----------|-----------------|---------------|
+| `/ai-factory-roadmap` | Strategic planning, milestones, long-term vision | No | `.ai-factory/ROADMAP.md` |
 | `/ai-factory-task` | Small tasks, quick fixes, experiments | No | `.ai-factory/PLAN.md` |
 | `/ai-factory-feature` | Full features, stories, epics | Yes | `.ai-factory/features/<branch>.md` |
 | `/ai-factory-feature --parallel` | Concurrent features via worktrees | Yes + worktree | User runs `/ai-factory-task` in worktree |
@@ -116,6 +117,16 @@ AI Factory provides a set of **workflow skills** that form the core development 
 ## Workflow Skills
 
 These skills form the development pipeline. Each one feeds into the next.
+
+### `/ai-factory-roadmap [check | vision]` — strategic planning
+
+```
+/ai-factory-roadmap                              # Create or update roadmap
+/ai-factory-roadmap SaaS for project management  # Create from vision
+/ai-factory-roadmap check                        # Auto-scan: find completed milestones
+```
+
+High-level project planning. Creates `.ai-factory/ROADMAP.md` — a strategic checklist of major milestones (not granular tasks). Use `check` to automatically scan the codebase and mark milestones that appear done. `/ai-factory-implement` also checks the roadmap after completing all tasks.
 
 ### `/ai-factory-feature <description>` — start a feature
 
