@@ -162,123 +162,11 @@ For matrix builds: use the minimum version from the project config as the lowest
 
 Store: `PACKAGE_MANAGER`, `LOCK_FILE`, `INSTALL_CMD`.
 
-### 2.4 Linters & Formatters
+### 2.4–2.7 Tool Detection
 
-Detect existing tools by scanning config files and dependency files:
+Detect project tools by scanning config files and dependencies. For the complete tool-to-command mapping → read `references/TOOL-COMMANDS.md`
 
-**PHP** (scan `composer.json` -> `require-dev`):
-
-| Tool | Config File | CI Command |
-|------|-------------|------------|
-| PHP-CS-Fixer | `.php-cs-fixer.php`, `.php-cs-fixer.dist.php` | `vendor/bin/php-cs-fixer fix --dry-run --diff` |
-| PHP_CodeSniffer | `phpcs.xml`, `phpcs.xml.dist` | `vendor/bin/phpcs` |
-| Pint | `pint.json` | `vendor/bin/pint --test` |
-
-**Node.js** (scan `package.json` -> `devDependencies`):
-
-| Tool | Config File | CI Command |
-|------|-------------|------------|
-| ESLint | `eslint.config.*`, `.eslintrc.*` | `npx eslint .` |
-| Prettier | `.prettierrc*`, `prettier.config.*` | `npx prettier --check .` |
-| Biome | `biome.json`, `biome.jsonc` | `npx biome check .` |
-
-**Python** (scan `pyproject.toml` -> `[tool.*]` sections, `requirements-dev.txt`):
-
-| Tool | Config File | CI Command |
-|------|-------------|------------|
-| Ruff | `ruff.toml`, `pyproject.toml [tool.ruff]` | `ruff check .` / `ruff format --check .` |
-| Black | `pyproject.toml [tool.black]` | `black --check .` |
-| isort | `pyproject.toml [tool.isort]` | `isort --check-only .` |
-| Flake8 | `.flake8`, `setup.cfg [flake8]` | `flake8 .` |
-| Pylint | `.pylintrc`, `pyproject.toml [tool.pylint]` | `pylint src/` |
-
-**Go:**
-
-| Tool | Config File | CI Command |
-|------|-------------|------------|
-| golangci-lint | `.golangci.yml`, `.golangci.yaml` | `golangci-lint run` |
-
-**Rust** (built-in):
-
-| Tool | CI Command |
-|------|------------|
-| clippy | `cargo clippy --all-targets --all-features -- -D warnings` |
-| rustfmt | `cargo fmt --all -- --check` |
-
-**Java:**
-
-| Tool | Config File | CI Command (Maven) | CI Command (Gradle) |
-|------|-------------|-------------------|---------------------|
-| Checkstyle | `checkstyle.xml` | `mvn checkstyle:check -B` | `./gradlew checkstyleMain` |
-| PMD | `pmd-ruleset.xml` | `mvn pmd:check -B` | `./gradlew pmdMain` |
-| SpotBugs | — | `mvn compile spotbugs:check -B` | `./gradlew spotbugsMain` |
-
-### 2.5 Static Analysis Tools
-
-**PHP** (scan `composer.json` -> `require-dev`):
-
-| Tool | Config File | CI Command |
-|------|-------------|------------|
-| PHPStan | `phpstan.neon`, `phpstan.neon.dist` | `vendor/bin/phpstan analyse --memory-limit=512M` |
-| Psalm | `psalm.xml`, `psalm.xml.dist` | `vendor/bin/psalm --no-cache` |
-| Rector | `rector.php` | `vendor/bin/rector process --dry-run` |
-
-**Python:**
-
-| Tool | CI Command |
-|------|------------|
-| mypy | `mypy src/` |
-| pyright | `pyright` |
-
-**Node.js (TypeScript):**
-
-| Tool | CI Command |
-|------|------------|
-| tsc | `npx tsc --noEmit` |
-
-**Go:**
-- `golangci-lint` includes static analysis (go vet, staticcheck, etc.)
-
-**Rust:**
-- `cargo clippy` covers static analysis
-
-### 2.6 Test Framework
-
-| Language | Detect By | Test Command |
-|----------|-----------|--------------|
-| PHP | `phpunit/phpunit` in composer.json | `vendor/bin/phpunit` |
-| PHP | `pestphp/pest` in composer.json | `vendor/bin/pest --ci` |
-| Node.js | `jest` in package.json | `npx jest --ci` |
-| Node.js | `vitest` in package.json | `npx vitest run` |
-| Python | `pytest` in pyproject.toml | `pytest -v` |
-| Go | Built-in | `go test -race -v ./...` |
-| Rust | Built-in | `cargo test --all-features` |
-| Java | Built-in (JUnit) | `mvn verify -B` / `./gradlew test` |
-
-Also detect coverage tools:
-
-| Language | Coverage Flag |
-|----------|--------------|
-| PHP | `--coverage-clover coverage.xml` |
-| Node.js (Jest) | `--coverage` |
-| Node.js (Vitest) | `--coverage` |
-| Python | `--cov=src --cov-report=xml` |
-| Go | `-coverprofile=coverage.out -covermode=atomic` |
-| Rust | `cargo tarpaulin --ignore-tests --out xml` |
-| Java | `mvn jacoco:report` / `./gradlew jacocoTestReport` |
-
-### 2.7 Security Audit Tools
-
-| Language | Tool | CI Command |
-|----------|------|------------|
-| PHP | Composer audit | `composer audit` |
-| Node.js | npm audit | `npm audit --audit-level=high` |
-| Python | pip-audit | `pip-audit` or `uv run pip-audit` (dependency vulnerabilities) |
-| Python | bandit | `bandit -r src/` or `uv run bandit -r src/` (code security) |
-| Go | govulncheck | `govulncheck ./...` |
-| Rust | cargo audit | `cargo audit` |
-| Rust | cargo deny | `cargo deny check` |
-| Java | OWASP | `mvn dependency-check:check -B` |
+Categories: **Linters & Formatters** (PHP-CS-Fixer, ESLint, Prettier, Biome, Ruff, golangci-lint, clippy, Checkstyle), **Static Analysis** (PHPStan, Psalm, Rector, mypy, tsc), **Test Frameworks** (PHPUnit, Pest, Jest, Vitest, pytest, go test, cargo test) with coverage flags, **Security Audit** (composer audit, npm audit, pip-audit, govulncheck, cargo audit).
 
 ### 2.8 Services Detection
 
@@ -471,171 +359,20 @@ If the project has both a formatter AND a linter from the same ecosystem, combin
 
 **Do NOT combine** lint/SA with tests — they should fail independently with clear feedback.
 
-**`security.yml` example** (when `WANT_SECURITY`):
-
-```yaml
-name: Security
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-  schedule:
-    - cron: '0 6 * * 1'  # Weekly on Monday
-
-permissions:
-  contents: read
-
-jobs:
-  dependency-audit:
-    name: Dependency Audit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      # Language-specific: composer audit / govulncheck / npm audit / cargo deny
-
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
-        with:
-          fail-on-severity: high
-```
-
-**`tests.yml` example:**
-
-```yaml
-name: Tests
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-
-concurrency:
-  group: tests-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
-
-jobs:
-  tests:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      # Language-specific setup + test command
-```
+Use the templates in `templates/github/` and `templates/gitlab/` as a base for generating workflow files. Follow the header pattern (name, on, concurrency, permissions) and per-file job organization described above.
 
 ### 4.2 GitLab CI Generation
 
 Output file: `.gitlab-ci.yml`
 
-**Pipeline structure:**
+For GitLab-specific pipeline structure, cache strategy, report format integration, and language-specific patterns → read `references/GITLAB-PATTERNS.md`
 
-```yaml
-stages:
-  - install
-  - lint
-  - test
-  - build
-
-workflow:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
-default:
-  interruptible: true
-```
-
-**Job organization:**
-
-| Stage | Jobs | Notes |
-|-------|------|-------|
-| `install` | `install` | Install dependencies, cache + artifact for downstream |
-| `lint` | `code-style`, `lint`, `static-analysis`, `rector` | All `needs: [install]`, run in parallel |
-| `test` | `tests` | `needs: [install]` |
-| `build` | `build` | `needs: [tests, lint, ...]` |
-| `security` | `security` | `needs: [install]`, `allow_failure: true` |
-
-**GitLab-specific features:**
-
-1. **Cache strategy**: Use `policy: pull-push` on `install` job, `policy: pull` on all others
-2. **Cache key**: Use `key: files:` with lock file for automatic invalidation
-3. **Artifacts**: Pass `vendor/`/`node_modules/` via artifacts from install job (faster than cache for same-pipeline)
-4. **Reports**: Use `artifacts.reports.junit` for test results, `artifacts.reports.codequality` for lint output
-5. **DAG**: Use `needs:` keyword for parallel execution within stages
-6. **Hidden jobs**: Use `.setup` anchors for shared `before_script` and cache config
-7. **Coverage regex**: Add `coverage:` regex for test jobs
-
-**PHP-specific GitLab patterns:**
-
-```yaml
-image: php:8.3-cli
-
-variables:
-  COMPOSER_HOME: $CI_PROJECT_DIR/.composer
-
-.composer-setup:
-  before_script:
-    - apt-get update && apt-get install -y git unzip
-    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-```
-
-**Report formats for GitLab integration:**
-
-| Tool | Flag | Report Type |
-|------|------|-------------|
-| PHPStan | `--error-format=gitlab` | `codequality` |
-| ESLint | `--format json` | `codequality` |
-| Ruff | `--output-format=gitlab` | `codequality` |
-| golangci-lint | `--out-format code-climate` | `codequality` |
-| PHPUnit | `--log-junit report.xml` | `junit` |
-| Jest | `--reporters=jest-junit` | `junit` |
-| pytest | `--junitxml=report.xml` | `junit` |
+Pipeline stages: install → lint → test → build → security
 
 ### 4.3 Service Containers
 
-If `services_needed` is not empty, add service containers to the test job:
-
-**GitHub Actions:**
-
-```yaml
-tests:
-  services:
-    postgres:
-      image: postgres:17
-      env:
-        POSTGRES_DB: test
-        POSTGRES_USER: test
-        POSTGRES_PASSWORD: test
-      ports:
-        - 5432:5432
-      options: >-
-        --health-cmd pg_isready
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
-```
-
-**GitLab CI:**
-
-```yaml
-tests:
-  services:
-    - name: postgres:17
-      alias: db
-  variables:
-    POSTGRES_DB: test
-    POSTGRES_USER: test
-    POSTGRES_PASSWORD: test
-    DATABASE_URL: "postgresql://test:test@db:5432/test"
-```
+If `services_needed` is not empty, add service containers to the test job.
+For GitHub Actions and GitLab CI service container syntax → read `references/SERVICE-CONTAINERS.md`
 
 ### Quality Checks (Before Writing)
 
@@ -692,54 +429,13 @@ Compare existing pipeline against `PROJECT_PROFILE`:
 - No path filtering for monorepos?
 - No `workflow_dispatch` trigger (GitHub Actions)?
 
-### 5.2 Audit Report
+### 5.2 Audit Report & Fix
 
-```
-## CI Pipeline Audit
+For audit report format, fix flow options, and display templates → read `references/AUDIT-REPORT.md`
 
-### Jobs
-| Check | Status | Detail |
-|-------|--------|--------|
-| Code style job | ✅ | php-cs-fixer dry-run |
-| Static analysis | ❌ | PHPStan installed but no CI job |
-| Rector check | ❌ | rector.php exists but no CI job |
-| Tests | ✅ | PHPUnit with coverage |
-| Security audit | ❌ | No dependency scanning |
+Present results as tables with ✅/❌/⚠️ per check. Categorize recommendations by severity (CRITICAL, HIGH, MEDIUM, LOW). Ask user to choose: fix all, fix critical only, or show details first.
 
-### Configuration
-| Check | Status | Detail |
-|-------|--------|--------|
-| Caching | ⚠️ | Missing composer cache |
-| Concurrency | ❌ | No concurrency group |
-| Permissions | ❌ | No explicit permissions |
-| Matrix builds | ⚠️ | Only PHP 8.3, missing 8.2 |
-
-### Recommendations
-1. CRITICAL: Add PHPStan job — phpstan.neon exists
-2. CRITICAL: Add Rector dry-run job — rector.php exists
-3. HIGH: Add concurrency group to cancel redundant runs
-4. HIGH: Add composer cache for faster installs
-5. MEDIUM: Add security audit job (composer audit)
-6. LOW: Add PHP 8.2 to test matrix
-```
-
-### 5.3 Fix Issues
-
-```
-AskUserQuestion: CI audit found issues. What should we do?
-
-Options:
-1. Fix all — Apply all recommendations
-2. Fix critical only — Add missing jobs, skip configuration improvements
-3. Show details — Explain each issue before deciding
-```
-
-**If fixing:**
-- For missing jobs -> add new jobs to existing pipeline
-- For configuration issues -> edit existing jobs
-- Preserve existing structure, job names, and ordering conventions
-- For GitHub Actions: edit in-place or add new workflow files
-- For GitLab CI: edit `.gitlab-ci.yml` in-place
+**If fixing:** preserve existing structure, job names, and ordering conventions.
 
 ---
 
@@ -777,41 +473,8 @@ Edit existing files using the `Edit` tool. Preserve the original structure and o
 
 ### 7.1 Display Summary
 
-```
-## CI Pipeline Generated
-
-### Platform
-GitHub Actions
-
-### Files Created
-| File | Purpose |
-|------|---------|
-| .github/workflows/lint.yml | code-style, static-analysis, rector |
-| .github/workflows/tests.yml | phpunit (PHP 8.2, 8.3, 8.4) |
-| .github/workflows/security.yml | composer audit |
-
-### Features
-- Composer caching via shivammathur/setup-php
-- Concurrency groups (cancel redundant runs)
-- Matrix builds for PHP 8.2, 8.3, 8.4
-- Coverage upload as artifact
-
-### Quick Start
-  # Trigger manually
-  gh workflow run ci.yml
-
-  # View runs
-  gh run list --workflow=ci.yml
-```
+Display summary using format from `references/AUDIT-REPORT.md` (Summary Display Template section). Show platform, files created, features, and quick start commands.
 
 ### 7.2 Suggest Follow-Up Skills
 
-```
-AskUserQuestion: CI pipeline is ready. What's next?
-
-Options:
-1. Build automation — Run /ai-factory-build-automation to add CI targets to Makefile/Taskfile
-2. Docker setup — Run /ai-factory-dockerize to containerize the project
-3. Both
-4. Done — Skip follow-ups
-```
+Suggest: `/ai-factory-build-automation` for CI targets in Makefile/Taskfile, `/ai-factory-dockerize` for containerization.

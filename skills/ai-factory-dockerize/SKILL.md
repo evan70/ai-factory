@@ -363,68 +363,17 @@ The shared configuration:
   - Elasticsearch → with healthcheck, JVM memory, ulimits
   - MinIO → with healthcheck
 
-**Reverse proxy (Angie/Nginx):**
-- Image: `docker.angie.software/angie:<version>-alpine` (Angie) or `nginx:<version>-alpine` (Nginx) — verify current version online before using
-- Volume-mount config: `./docker/angie/angie.conf:/etc/angie/angie.conf:ro`
-- Healthcheck: `CMD wget --spider -q http://localhost/health || exit 1`
-- Sits on `frontend` network, proxies to `app` on `backend` network
-- In production: read_only, cap_add NET_BIND_SERVICE for port 80/443
-- Named volumes for all data directories
-- Separate `frontend` and `backend` networks
+**Reverse proxy (Angie/Nginx):** Use `docker.angie.software/angie:<version>-alpine` (Angie) or `nginx:<version>-alpine` (Nginx) — verify current version online. Mount config from `docker/angie/`. Sits on `frontend` network, proxies to `app` on `backend` network. In production: read_only, cap_add NET_BIND_SERVICE.
 
-**Environment variable strategy — `env_file` over `environment`:**
-
-Use `env_file: .env` on `app` service. Do NOT list every app variable in `environment:`.
-
-Only use `environment:` for:
-1. **Computed values** that compose assembles from parts: `DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}`
-2. **Infrastructure image config** on their own services: `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` on `db` service
-
-Everything else (API keys, feature flags, app settings) — the app reads from `.env` directly via `env_file:`.
-
-```yaml
-# CORRECT
-services:
-  app:
-    env_file: .env
-    environment:
-      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-
-# WRONG — duplicating .env in compose, maintenance burden
-services:
-  app:
-    environment:
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
-      TOKEN_TTL_DAYS: ${TOKEN_TTL_DAYS:-7}
-      # ...20 more lines of the same
-```
+**Environment variable strategy and service configuration patterns** — Read `references/COMPOSE-PATTERNS.md`
 
 **Service inclusion is conditional** — only add services that were detected in Step 2.5.
 
 ### 4.3 Generate compose.override.yml (Development)
 
-Development overrides:
+Development overrides: `build.target: development`, bind mount source code (`.:/app`), expose all ports, dev env vars, dev command override, `mailpit` service (profile: `dev`) if email detected. **No database admin UIs** — use native GUI clients via exposed DB port.
 
-- `build.target: development`
-- Bind mount source code (`.:/app`) with anonymous volume for deps
-- Expose all ports (app, debug, database, cache)
-- `NODE_ENV=development` / `LOG_LEVEL=debug` etc.
-- Dev command override
-- Dev-only services (with profiles):
-  - `mailpit` → if email sending detected (profile: `dev`)
-- **No database admin UIs** (pgAdmin, Adminer) — use native GUI clients (TablePlus, DBeaver, DataGrip) via the exposed DB port instead. Admin UIs in compose add attack surface and unnecessary complexity.
-
-**Hot-reload tool config check:**
-
-If the dev stage uses a hot-reload tool, verify its config file exists and points to the correct entry point. Many tools assume the main file is in the project root — if it's not (e.g. `./cmd/server/main.go`), the tool will fail without a config.
-
-| Stack | Tool | Config | Key setting |
-|-------|------|--------|-------------|
-| Go | air | `.air.toml` | `build.cmd` → path to main package |
-| Node.js | nodemon | `nodemon.json` | `exec` / `watch` paths |
-
-If the config file doesn't exist and the entry point is non-standard, generate it alongside the Docker files. If the config already exists, do not overwrite it.
+**Hot-reload:** If dev stage uses air (Go) or nodemon (Node.js), verify its config file exists and points to the correct entry point. Generate config if missing and entry point is non-standard.
 
 ### 4.4 Generate compose.production.yml (Hardened)
 
@@ -489,242 +438,36 @@ Verify generated content before passing to Step 6:
 
 When `MODE = "enhance"` or `MODE = "audit"`, analyze `EXISTING_CONTENT` against the security checklist and best practices.
 
-**Enhance mode** (`MODE = "enhance"`): Local Docker exists but no production config. After auditing local files, create production configuration (compose.production.yml, deploy scripts, security hardening). Ask interactive questions about missing infrastructure (same as Step 1.3) before generating production files.
+**Enhance mode** (`MODE = "enhance"`): Local Docker exists but no production config. After auditing local files, create production configuration. Ask interactive questions about missing infrastructure (same as Step 1.3) before generating production files.
 
-### 5.1 Dockerfile Audit
+For detailed audit procedures, report format, fix flow, and enhance mode steps → read `references/AUDIT-GUIDE.md`
 
-Read each section from `references/SECURITY-CHECKLIST.md` → "Dockerfile Security" and check:
+**What to audit:**
+- **Dockerfile**: image pinning, minimal base, multi-stage, non-root user, no secrets in ENV/ARG, .dockerignore, BuildKit features, HEALTHCHECK
+- **Compose per-service**: read_only, no-new-privileges, cap_drop ALL, user, tmpfs, resource limits, healthcheck, log rotation, restart policy
+- **Network**: internal backend, no host networking, no Docker socket
+- **Secrets**: values in .env not hardcoded, .env in .gitignore, .env.example exists
+- **Gaps**: services detected in code but missing from compose
 
-- Image pinning (no `:latest`)
-- Minimal base image
-- Multi-stage build present
-- Non-root user in final stage
-- No secrets in ENV/ARG
-- .dockerignore exists and is comprehensive
-- BuildKit features used (cache mounts)
-- HEALTHCHECK instruction present
-
-### 5.2 Compose Security Audit
-
-Read each section from `references/SECURITY-CHECKLIST.md` → "Compose Security" and check:
-
-**For each service:**
-- `read_only: true`?
-- `security_opt: [no-new-privileges:true]`?
-- `cap_drop: [ALL]`?
-- `user:` specified?
-- `tmpfs` for temp directories?
-- Resource limits set?
-- Healthcheck defined?
-- Log rotation configured?
-- Restart policy set?
-
-**Network security:**
-- Backend network `internal: true`?
-- No `network_mode: host`?
-- No Docker socket mounted?
-
-**Secrets:**
-- Sensitive values via `.env` (not hardcoded in compose)?
-- `.env` in `.gitignore`?
-- `.env.example` exists with placeholder values?
-
-### 5.3 Gap Analysis
-
-Compare existing compose against `PROJECT_PROFILE`:
-- Services detected in code but missing from compose?
-- .env variables referenced but no matching service?
-- Dev override file exists?
-- Production hardening file exists?
-
-### 5.4 Audit Report
-
-```
-## Docker Security Audit
-
-### Dockerfile
-| Check | Status | Detail |
-|-------|--------|--------|
-| Pinned base image | ✅ | node:22.5-alpine |
-| Multi-stage build | ✅ | 3 stages |
-| Non-root user | ❌ | Running as root in final stage |
-| No secrets in ENV | ✅ | |
-| .dockerignore | ⚠️ | Missing: .env*, docker-compose* |
-| Healthcheck | ❌ | No HEALTHCHECK instruction |
-
-### compose.yml
-| Service | read_only | no-new-privs | cap_drop | resources | healthcheck | logging |
-|---------|-----------|-------------|----------|-----------|-------------|---------|
-| app | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| db | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ |
-| redis | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-
-### Missing Infrastructure
-- Redis detected in code but not in compose
-- RabbitMQ connection string found but no service defined
-
-### Recommendations
-1. CRITICAL: Add non-root user to Dockerfile
-2. CRITICAL: Create compose.production.yml with security hardening
-3. HIGH: Add resource limits to all services
-4. HIGH: Add log rotation to all services
-5. MEDIUM: Add healthcheck to redis service
-6. LOW: Update .dockerignore to exclude .env files
-```
-
-### 5.5 Fix Issues
-
-```
-AskUserQuestion: Audit found issues. What should we do?
-
-Options:
-1. Fix all — Apply all recommendations
-2. Fix critical only — Fix security issues, skip improvements
-3. Show details — Explain each issue before deciding
-4. Export report — Save audit report to .ai-factory/docker-audit.md
-```
-
-**If fixing:**
-- For Dockerfile issues → edit existing Dockerfile
-- For missing compose.production.yml → generate it (Step 4.4)
-- For missing services → add to existing compose
-- For security hardening → add to compose.production.yml
-- Preserve existing structure and naming conventions
-
-### 5.6 Enhance Mode — Create Production Config
-
-**Only for `MODE = "enhance"`** (local Docker exists, no production config):
-
-After auditing and fixing local compose, proceed to generate missing production files:
-
-1. **Ask infrastructure questions** (same as Step 1.3) for any services not yet in compose:
-   - Database type if not already present
-   - Reverse proxy (Angie preferred) if needed for production
-   - Additional services
-
-2. **Generate missing files:**
-   - `compose.production.yml` → hardened overlay (Step 4.4)
-   - `.dockerignore` → if missing (Step 4.5)
-   - `.env.example` → if missing (Step 6.3)
-   - Deploy scripts → (Step 8)
-
-3. **Improve existing files:**
-   - Add `COMPOSE_PROJECT_NAME` to compose.yml if missing
-   - Add healthchecks to services missing them
-   - Add `depends_on` with `condition: service_healthy`
-   - Ensure logging to stdout/stderr in Dockerfile
-   - Preserve existing structure and naming conventions
+Present results as tables with ✅/❌/⚠️. Ask user: fix all, fix critical only, show details, or export report.
 
 ---
 
 ## Step 6: Write Files
 
-### 6.0 File Organization
+For detailed file organization (directory layout, file tables per mode, .env.example template, volume mount examples) → read `references/FILE-ORGANIZATION.md`
 
-**Root directory** — only files Docker expects by convention:
-- `Dockerfile` — CI/CD, Docker Hub, GitHub Actions look for it in root
-- `compose.yml`, `compose.override.yml`, `compose.production.yml` — `docker compose` looks in root
-- `.dockerignore` — must be in build context root
+### 6.0 Overview
 
-**`docker/` directory** — all service configs and supporting files:
-```
-docker/
-├── angie/                    # Reverse proxy (if used)
-│   ├── angie.conf
-│   └── conf.d/
-│       └── default.conf
-├── postgres/                 # DB init scripts (if needed)
-│   └── init.sql
-├── php/                      # PHP-FPM config (if PHP project)
-│   ├── php.ini
-│   └── php-fpm.conf
-└── redis/                    # Custom Redis config (if needed)
-    └── redis.conf
-```
+- **Root**: `Dockerfile`, `compose.yml`, `compose.override.yml`, `compose.production.yml`, `.dockerignore`
+- **`docker/`**: service configs (angie, postgres, php, redis) — only create what's needed
+- **`deploy/scripts/`**: production ops scripts (Step 8)
 
-**`deploy/` directory** — production ops scripts:
-```
-deploy/
-└── scripts/
-    ├── deploy.sh
-    ├── update.sh
-    ├── logs.sh
-    ├── health-check.sh
-    ├── rollback.sh
-    └── backup.sh
-```
+### 6.1 Generate Mode — write all root files + conditional docker/ dirs + deploy/scripts/
 
-**Rule:** Only create directories that are needed. If no reverse proxy → no `docker/angie/`. If no custom DB init → no `docker/postgres/`.
+### 6.2 Audit / Enhance Mode — only write changed/new files, respect existing layout
 
-### 6.1 Generate Mode — Write All Files
-
-**Always created (root):**
-
-| File | Purpose |
-|------|---------|
-| `Dockerfile` | Multi-stage (dev + prod) |
-| `compose.yml` | Base configuration with `COMPOSE_PROJECT_NAME` |
-| `compose.override.yml` | Development overrides |
-| `compose.production.yml` | Production hardened |
-| `.dockerignore` | Build context exclusions |
-
-**Conditionally created (`docker/`):**
-
-| Directory | When |
-|-----------|------|
-| `docker/angie/` | Reverse proxy selected (Angie/Nginx) |
-| `docker/postgres/` | Custom init scripts needed |
-| `docker/php/` | PHP project (php.ini, php-fpm.conf) |
-| `docker/redis/` | Custom Redis config needed |
-
-**Always created:**
-
-| Directory | Purpose |
-|-----------|---------|
-| `deploy/scripts/` | Production ops scripts (Step 8) |
-
-Update compose volumes to reference `docker/` paths:
-```yaml
-# Example: Angie config mount
-volumes:
-  - ./docker/angie/angie.conf:/etc/angie/angie.conf:ro
-  - ./docker/angie/conf.d:/etc/angie/conf.d:ro
-```
-
-### 6.2 Audit / Enhance Mode — Write Fixed/New Files
-
-Only write files that were changed or created. Don't overwrite files that passed audit. Respect existing file structure — if project already uses a different layout (e.g. `nginx/` instead of `docker/nginx/`), follow their convention.
-
-### 6.3 Create .env.example (if not exists)
-
-If `.env.example` doesn't exist, generate one. **Single file with sections** — no separate `.env.prod.example`. Production-only vars are commented out.
-
-Build from: compose variables + detected app env vars from `.env.example`/code.
-
-```env
-# === Project ===
-COMPOSE_PROJECT_NAME=myapp
-
-# === Database ===
-DB_NAME=mydb
-DB_USER=app
-DB_PASSWORD=changeme
-POSTGRES_VERSION=17
-
-# === Application ===
-LOG_LEVEL=debug                          # prod: warn
-
-# (add project-specific vars detected in Step 2.8)
-
-# === Production (uncomment for deploy) ===
-# DOCKER_REGISTRY=ghcr.io
-# DOCKER_IMAGE=myapp
-# VERSION=latest
-# ALLOWED_ORIGINS=https://myapp.com
-# TRUSTED_PROXIES=172.16.0.0/12
-```
-
-Also ensure `.env` is in `.gitignore`.
+### 6.3 Create .env.example if missing — single file with sections, production vars commented out. Ensure `.env` in `.gitignore`.
 
 ---
 
@@ -732,167 +475,24 @@ Also ensure `.env` is in `.gitignore`.
 
 Regardless of mode, run the production security checklist on the final compose.production.yml.
 
-Read `references/SECURITY-CHECKLIST.md` and verify every item on the generated/existing production file.
+Read `references/SECURITY-CHECKLIST.md` and verify every item. Check categories: Container Isolation (read_only, no-new-privileges, cap_drop, non-root, tmpfs), Network & Ports (internal backend, no host networking, no Docker socket, no infra ports exposed), Resources (memory/CPU/PID limits), Secrets (.env not hardcoded, .gitignore, .env.example), Health & Logging (healthcheck, log rotation, restart policy), Images (version-pinned, minimal base).
 
-Display a compact checklist result:
-
-```
-## Production Security Checklist
-
-### Container Isolation
-- [x] read_only filesystem on all services
-- [x] no-new-privileges on all services
-- [x] cap_drop ALL on all services
-- [x] Non-root user on all services
-- [x] tmpfs for temp directories
-
-### Network & Ports
-- [x] Backend network internal (no internet)
-- [x] No host networking
-- [x] No Docker socket mounted
-- [x] No ports exposed on infrastructure services (DB, Redis)
-- [x] Only proxy/app exposes 80/443
-
-### Resources
-- [x] Memory limits on all services
-- [x] CPU limits on all services
-- [x] PID limits on all services
-
-### Secrets
-- [x] Sensitive values in .env file (not hardcoded in compose)
-- [x] .env file in .gitignore
-- [x] .env.example exists (without real values)
-
-### Health & Logging
-- [x] Healthcheck on every service
-- [x] Log rotation on every service
-- [x] restart: unless-stopped on all services
-
-### Images
-- [x] All images version-pinned
-- [x] Minimal base images used
-- [ ] Image vulnerability scanning (recommend: add to CI)
-
-Score: 20/21 checks passed
-```
-
-If any checks fail → offer to fix immediately (same as Step 5.5).
+Display as compact checklist with `[x]`/`[ ]` per item and a score. If any checks fail → offer to fix immediately.
 
 ---
 
 ## Step 8: Generate Deploy Scripts (Production)
 
-Generate production deployment scripts in `deploy/scripts/`. These scripts assume `compose.yml` + `compose.production.yml` and provide a complete ops toolkit.
+Generate production deployment scripts in `deploy/scripts/` from templates.
 
-### 8.1 Read Deploy Script Templates
+Read `references/DEPLOY-SCRIPTS.md` for script customization points and generation rules.
 
-```
-Read skills/dockerize/templates/deploy.sh
-Read skills/dockerize/templates/update.sh
-Read skills/dockerize/templates/logs.sh
-Read skills/dockerize/templates/health-check.sh
-Read skills/dockerize/templates/rollback.sh
-Read skills/dockerize/templates/backup.sh
-```
-
-### 8.2 Generate Scripts
-
-Customize each template based on `PROJECT_PROFILE`:
-
-| Script | Purpose | Customization |
-|--------|---------|---------------|
-| `deploy/scripts/deploy.sh` | Initial production deployment | Pre-flight checks, build, start, health verify |
-| `deploy/scripts/update.sh` | Zero-downtime rolling update | Pre-backup, pull, build, recreate app, health check |
-| `deploy/scripts/logs.sh` | Log aggregation utility | Service names from compose |
-| `deploy/scripts/health-check.sh` | Full health diagnostics | App port, health endpoints |
-| `deploy/scripts/rollback.sh` | Version rollback | Git-based version detection |
-| `deploy/scripts/backup.sh` | Database backup with retention | DB_USER, DB_NAME from .env |
-
-**Customization points for all scripts:**
-- `COMPOSE_FILE` / `COMPOSE_PROD` paths (relative from `deploy/scripts/`)
-- App port from `PROJECT_PROFILE.port`
-- DB user/name from `.env.example`
-- Service names from generated `compose.yml`
-- Health check endpoint URL
-
-**All scripts must:**
-- Use `set -euo pipefail`
-- Have colored logging (`log_info`, `log_success`, `log_error`)
-- Calculate `PROJECT_ROOT` relative to script location
-- Use `docker compose -f compose.yml -f compose.production.yml` pattern
-- Include usage comments in header
-
-### 8.3 Write Scripts
-
-```
-Write deploy/scripts/deploy.sh
-Write deploy/scripts/update.sh
-Write deploy/scripts/logs.sh
-Write deploy/scripts/health-check.sh
-Write deploy/scripts/rollback.sh
-Write deploy/scripts/backup.sh
-Bash: chmod +x deploy/scripts/*.sh
-```
-
-### 8.4 Skip Condition
-
-If `MODE = "audit"` and deploy scripts already exist:
-- Check existing scripts against templates for missing functionality
-- Suggest improvements but don't overwrite
+Templates: `templates/deploy.sh`, `templates/update.sh`, `templates/logs.sh`, `templates/health-check.sh`, `templates/rollback.sh`, `templates/backup.sh`
 
 ---
 
 ## Step 9: Summary & Follow-Up
 
-### 9.1 Display Summary
+Display a summary of all created/updated files using the format from `references/SUMMARY-FORMAT.md`.
 
-```
-## Docker Setup Complete
-
-### Files Created/Updated
-- Dockerfile (multi-stage: development + production)
-- compose.yml (app + postgres + redis, COMPOSE_PROJECT_NAME from .env)
-- compose.override.yml (dev: hot reload, debug ports, mailpit)
-- compose.production.yml (hardened: read-only, non-root, resource limits, no infra ports)
-- .dockerignore (38 exclusion rules)
-- .env.example (with COMPOSE_PROJECT_NAME, DB credentials, app config)
-- docker/angie/ (reverse proxy config, if needed)
-- deploy/scripts/ (deploy, update, logs, health-check, rollback, backup)
-
-### Quick Start
-  # Development
-  docker compose up
-
-  # Development with email testing
-  docker compose --profile dev up
-
-  # Production (locally)
-  docker compose -f compose.yml -f compose.production.yml up -d
-
-  # Build production image
-  docker build --target production -t myapp:latest .
-
-### Services
-| Service | Port (dev) | Port (prod) | Image |
-|---------|------------|-------------|-------|
-| app | 3000, 9229 | — | built locally |
-| postgres | 5432 | — | postgres:17-alpine |
-| redis | 6379 | — | redis:7-alpine |
-| mailpit | 8025, 1025 | — | axllent/mailpit |
-```
-
-### 9.2 Suggest Follow-Up Skills
-
-```
-AskUserQuestion: Docker setup complete. What's next?
-
-Options:
-1. Build automation — Run /ai-factory-build-automation to add Docker targets to Makefile/Taskfile
-2. Update docs — Run /ai-factory-docs to document the Docker setup
-3. Both — Build automation first, then docs
-4. Done — Skip follow-ups
-```
-
-**If build automation** → suggest invoking `/ai-factory-build-automation`
-**If docs** → suggest invoking `/ai-factory-docs`
-**If both** → suggest build-automation first, then docs
+Suggest follow-up: `/ai-factory-build-automation` for Docker targets, `/ai-factory-docs` for documentation.
