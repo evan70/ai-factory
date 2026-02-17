@@ -10,7 +10,7 @@ allowed-tools: Read Glob Grep Write Bash(mkdir *) Bash(npx skills *) Bash(python
 Set up Claude Code for your project by:
 1. Analyzing the tech stack
 2. Installing skills from [skills.sh](https://skills.sh)
-3. Generating custom skills via `/ai-factory.skill-generator`
+3. Generating custom skills via `/ai-factory-skill-generator`
 4. Configuring MCP servers for external integrations
 
 ## CRITICAL: Security Scanning
@@ -47,8 +47,8 @@ For each recommended skill:
   3. SECURITY: Scan installed skill → python security-scan.py <path>
      - BLOCKED? → rm -rf <path>, warn user, skip this skill
      - WARNINGS? → show to user, ask confirmation
-  4. If not found → Generate: /ai-factory.skill-generator <name>
-  5. Has reference URLs? → Learn: /ai-factory.skill-generator <url1> [url2]...
+  4. If not found → Generate: /ai-factory-skill-generator <name>
+  5. Has reference URLs? → Learn: /ai-factory-skill-generator <url1> [url2]...
 ```
 
 **Learn Mode:** When you have documentation URLs, API references, or guides relevant to the project — pass them directly to skill-generator. It will study the sources and generate a skill based on real documentation instead of generic patterns. Always prefer Learn Mode when reference material is available.
@@ -148,7 +148,7 @@ Proceed? [Y/n]
    - Exit 1 (BLOCKED) → `rm -rf <path>`, warn user, skip this skill
    - Exit 2 (WARNINGS) → show to user, ask confirmation
    - Exit 0 (CLEAN) → read files yourself (Level 2), verify intent, proceed
-4. Generate custom skills via `/ai-factory.skill-generator` (pass URLs for Learn Mode when docs are available)
+4. Generate custom skills via `/ai-factory-skill-generator` (pass URLs for Learn Mode when docs are available)
 5. Configure MCP in `{{settings_file}}`
 6. Generate `AGENTS.md` in project root (see [AGENTS.md Generation](#agentsmd-generation))
 
@@ -385,7 +385,7 @@ Install skills, configure MCP, and generate `AGENTS.md` as in Mode 1.
 **Rules for AGENTS.md:**
 - Keep it factual — only describe what actually exists in the project
 - Update it when project structure changes significantly
-- The Documentation section will be maintained by `/ai-factory.docs`
+- The Documentation section will be maintained by `/ai-factory-docs`
 - Do NOT duplicate detailed content from DESCRIPTION.md — reference it instead
 
 ---
@@ -413,9 +413,9 @@ Skills installed: [list]
 MCP configured: [list]
 
 To start development:
-- /ai-factory.feature <description> — Start a new feature (creates branch + plan)
-- /ai-factory.task <description> — Create implementation plan only
-- /ai-factory.implement — Execute existing plan
+- /ai-factory-feature <description> — Start a new feature (creates branch + plan)
+- /ai-factory-task <description> — Create implementation plan only
+- /ai-factory-implement — Execute existing plan
 
 Ready when you are!
 ```
@@ -425,19 +425,19 @@ Ready when you are!
 ```
 Your project already has code. You might also want to set up:
 
-- /ai-factory.docs — Generate project documentation
-- /ai-factory.build-automation — Configure build scripts and automation
-- /ai-factory.ci — Set up CI/CD pipeline
-- /ai-factory.dockerize — Containerize the project
+- /ai-factory-docs — Generate project documentation
+- /ai-factory-build-automation — Configure build scripts and automation
+- /ai-factory-ci — Set up CI/CD pipeline
+- /ai-factory-dockerize — Containerize the project
 
 Would you like to run any of these now?
 ```
 
 Present these as `AskUserQuestion` with multi-select options:
-1. Generate docs (`/ai-factory.docs`)
-2. Build automation (`/ai-factory.build-automation`)
-3. CI/CD (`/ai-factory.ci`)
-4. Dockerize (`/ai-factory.dockerize`)
+1. Generate docs (`/ai-factory-docs`)
+2. Build automation (`/ai-factory-build-automation`)
+3. CI/CD (`/ai-factory-ci`)
+4. Dockerize (`/ai-factory-dockerize`)
 5. Skip — I'll do it later
 
 If user selects one or more → invoke the selected skills sequentially.

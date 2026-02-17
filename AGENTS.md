@@ -49,17 +49,17 @@ ai-factory/
 ### Working Directory
 All AI Factory files in user projects go to `.ai-factory/`:
 - `.ai-factory/DESCRIPTION.md` - project specification
-- `.ai-factory/PLAN.md` - task plan (from /ai-factory.task)
-- `.ai-factory/features/feature-*.md` - feature plans (from /ai-factory.feature)
+- `.ai-factory/PLAN.md` - task plan (from /ai-factory-task)
+- `.ai-factory/features/feature-*.md` - feature plans (from /ai-factory-feature)
 
 ### Skill Naming
-All skills use `ai-factory.` namespace prefix:
+All skills use `ai-factory-` prefix:
 - `/ai-factory` - main setup
-- `/ai-factory.feature`
-- `/ai-factory.task`
-- `/ai-factory.implement`
-- `/ai-factory.commit`
-- `/ai-factory.docs`
+- `/ai-factory-feature`
+- `/ai-factory-task`
+- `/ai-factory-implement`
+- `/ai-factory-commit`
+- `/ai-factory-docs`
 - etc.
 
 ## Workflow Logic
@@ -82,7 +82,7 @@ Check: has arguments? has project files?
     ↓
 STOP (does NOT implement)
 
-/ai-factory.feature <description>
+/ai-factory-feature <description>
     ↓
 Reads .ai-factory/DESCRIPTION.md for context
     ↓
@@ -90,9 +90,9 @@ Creates git branch (feature/xxx)
     ↓
 Asks: tests? logging level?
     ↓
-Calls /ai-factory.task → creates .ai-factory/features/feature-xxx.md
+Calls /ai-factory-task → creates .ai-factory/features/feature-xxx.md
 
-/ai-factory.task <description>
+/ai-factory-task <description>
     ↓
 Reads .ai-factory/DESCRIPTION.md for context
     ↓
@@ -104,7 +104,7 @@ Saves plan to .ai-factory/PLAN.md (direct) or .ai-factory/features/feature-xxx.m
     ↓
 For 5+ tasks: includes commit checkpoints
 
-/ai-factory.implement
+/ai-factory-implement
     ↓
 Reads .ai-factory/DESCRIPTION.md for context
     ↓
@@ -118,7 +118,7 @@ Prompts for commits at checkpoints
     ↓
 Offers to delete PLAN.md when done (keeps feature-*.md)
 
-/ai-factory.fix <bug description>
+/ai-factory-fix <bug description>
     ↓
 Reads .ai-factory/DESCRIPTION.md + patches for context
     ↓
@@ -132,7 +132,7 @@ Creates self-improvement patch in .ai-factory/patches/
     ↓
 NO plans, NO reports
 
-/ai-factory.evolve [skill-name|"all"]
+/ai-factory-evolve [skill-name|"all"]
     ↓
 Reads .ai-factory/DESCRIPTION.md + all patches
     ↓
@@ -296,6 +296,6 @@ After changes, verify:
 - [ ] `ai-factory init` works in empty directory
 - [ ] `ai-factory update` updates existing skills
 - [ ] `/ai-factory` in Claude Code shows interactive stack selection
-- [ ] `/ai-factory.feature` creates branch + plan file
-- [ ] `/ai-factory.implement` finds and executes plan
+- [ ] `/ai-factory-feature` creates branch + plan file
+- [ ] `/ai-factory-implement` finds and executes plan
 - [ ] Skills read `.ai-factory/DESCRIPTION.md`

@@ -50,10 +50,10 @@ ai-factory init
 /ai-factory
 
 # 5. Start building
-/ai-factory.feature Add user authentication with OAuth
+/ai-factory-feature Add user authentication with OAuth
 ```
 
-From here, AI Factory creates a branch, builds a plan, and you run `/ai-factory.implement` to execute it step by step.
+From here, AI Factory creates a branch, builds a plan, and you run `/ai-factory-implement` to execute it step by step.
 
 ## CLI Commands
 

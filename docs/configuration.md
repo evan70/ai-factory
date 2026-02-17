@@ -55,13 +55,13 @@ your-project/
 │   └── settings.local.json    # MCP config (Claude/Cursor, gitignored)
 ├── .ai-factory/               # AI Factory working directory
 │   ├── DESCRIPTION.md         # Project specification
-│   ├── PLAN.md                # Current plan (from /ai-factory.task)
+│   ├── PLAN.md                # Current plan (from /ai-factory-task)
 │   ├── SECURITY.md            # Ignored security items (from /security-checklist ignore)
-│   ├── features/              # Feature plans (from /ai-factory.feature)
+│   ├── features/              # Feature plans (from /ai-factory-feature)
 │   │   └── feature-*.md
-│   ├── patches/               # Self-improvement patches (from /ai-factory.fix)
+│   ├── patches/               # Self-improvement patches (from /ai-factory-fix)
 │   │   └── 2026-02-07-14.30.md
-│   └── evolutions/            # Evolution logs (from /ai-factory.evolve)
+│   └── evolutions/            # Evolution logs (from /ai-factory-evolve)
 │       └── 2026-02-08-10.00.md
 └── .ai-factory.json           # AI Factory config
 ```

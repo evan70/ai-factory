@@ -86,7 +86,7 @@ export async function initCommand(): Promise<void> {
     } else {
       console.log(chalk.dim(`  1. Open ${agentConfig.displayName} in this directory`));
       console.log(chalk.dim('  2. Run /ai-factory to analyze project and generate stack-specific skills'));
-      console.log(chalk.dim('  3. Use /ai-factory.feature to start new features, /ai-factory.commit to commit'));
+      console.log(chalk.dim('  3. Use /ai-factory-feature to start new features, /ai-factory-commit to commit'));
     }
     console.log('');
 

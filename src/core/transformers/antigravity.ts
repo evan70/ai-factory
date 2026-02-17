@@ -8,7 +8,7 @@ export class AntigravityTransformer implements AgentTransformer {
     if (WORKFLOW_SKILLS.has(skillName)) {
       return {
         targetDir: 'workflows',
-        targetName: `ai-factory.${skillName}.md`,
+        targetName: `${skillName}.md`,
         content: simplifyFrontmatter(content),
         flat: true,
       };
@@ -37,11 +37,11 @@ export class AntigravityTransformer implements AgentTransformer {
 
 ## Skill Usage
 
-- Use \`/ai-factory.feature\` for new features — creates branch, plan, and tasks
-- Use \`/ai-factory.fix\` for bug fixes — analyzes, fixes, suggests tests
-- Use \`/ai-factory.commit\` for commits — follows conventional commits
-- Use \`/ai-factory.implement\` to execute plans step by step
-- Use \`/ai-factory.review\` before merging — checks code quality
+- Use \`/ai-factory-feature\` for new features — creates branch, plan, and tasks
+- Use \`/ai-factory-fix\` for bug fixes — analyzes, fixes, suggests tests
+- Use \`/ai-factory-commit\` for commits — follows conventional commits
+- Use \`/ai-factory-implement\` to execute plans step by step
+- Use \`/ai-factory-review\` before merging — checks code quality
 
 ## Safety
 
@@ -58,13 +58,13 @@ AI Factory organizes skills into three categories:
 
 ### Workflows (.agent/workflows/)
 Action-oriented skills that execute specific tasks:
-- \`ai-factory.feature.md\` — Plan and develop new features
-- \`ai-factory.fix.md\` — Fix bugs with structured approach
-- \`ai-factory.implement.md\` — Execute plans step by step
-- \`ai-factory.commit.md\` — Create conventional commits
-- \`ai-factory.review.md\` — Code review checklist
-- \`ai-factory.deploy.md\` — Deployment automation
-- \`ai-factory.ci.md\` — CI/CD pipeline setup
+- \`ai-factory-feature.md\` — Plan and develop new features
+- \`ai-factory-fix.md\` — Fix bugs with structured approach
+- \`ai-factory-implement.md\` — Execute plans step by step
+- \`ai-factory-commit.md\` — Create conventional commits
+- \`ai-factory-review.md\` — Code review checklist
+- \`ai-factory-deploy.md\` — Deployment automation
+- \`ai-factory-ci.md\` — CI/CD pipeline setup
 
 ### Skills (.agent/skills/)
 Knowledge-based skills providing guidelines and patterns:
@@ -77,7 +77,7 @@ Always-active guardrails and conventions that apply to every interaction.
 
 ## Naming Convention
 
-- Workflow files: \`ai-factory.{action}.md\` (flat files)
+- Workflow files: \`ai-factory-{action}.md\` (flat files)
 - Skill directories: \`{skill-name}/SKILL.md\` (with supporting files)
 - Rule files: \`ai-factory-{rule-name}.md\`
 `;
