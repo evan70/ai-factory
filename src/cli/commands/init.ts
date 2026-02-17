@@ -31,12 +31,8 @@ async function removeAgentSetup(projectDir: string, agent: AgentInstallation): P
     }
   }
 
-  if (agentConfig.settingsFile) {
-    const settingsPath = path.join(projectDir, agentConfig.settingsFile);
-    if (await fileExists(settingsPath)) {
-      await removeFile(settingsPath);
-    }
-  }
+  // Keep agent settings file intact: it may contain user-managed configuration
+  // unrelated to AI Factory.
 }
 
 export async function initCommand(): Promise<void> {
