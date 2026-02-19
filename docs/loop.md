@@ -260,16 +260,39 @@ Use template-recommended phase thresholds by default (fallback: A=`0.8`, B=`0.9`
 
 If any rule with severity `fail` is failed, overall `passed=false` regardless of score.
 
-## Strict Output Mode
+## Iteration Output
 
-After each iteration, return:
+After each iteration, show a **compact summary** — do not dump full `run.json` or `artifact.md` into the conversation. The artifact is on disk; duplicating it wastes context.
 
-1. `run.json` snapshot (current loop state)
-2. `artifact.md` content
-3. `evaluation` result (score, passed, failures)
-4. `critique` block only when `passed=false`
+```text
+── Iteration {N}/{max} | Phase {A|B} | Score: {score} | {PASS|FAIL} ──
+Plan: {1-line summary}
+Hash: {first 8 chars of artifact SHA-256}
+Changed: {list of added/modified sections or "initial generation"}
+Failed: {rule IDs or "none"}
+Warnings: {rule IDs or "none"}
+Artifact: .ai-factory/evolution/<alias>/artifact.md
+```
 
-No extra prose in strict mode.
+If `passed=false`, append compact critique (rule ID + 1-line fix per issue).
+
+### Full output exceptions
+
+Show the full artifact content (not just summary) in these cases:
+
+1. **Loop termination** — final iteration always shows the complete artifact
+2. **Phase A → B transition** — show the phase-A-passing artifact in full once at the transition boundary for visibility (B-level evaluation still runs immediately per iteration flow)
+3. **Explicit user request** — user asks to see the full artifact
+
+## Context Management
+
+All loop state is persisted to disk. Clearing conversation context loses nothing — `resume` reconstructs from files.
+
+Recommend `/clear` then `/aif-loop resume` when:
+
+- After iteration 2 (midpoint of default 4-iteration loop)
+- On Phase A → B transition
+- When iteration >= 3
 
 ## Error Recovery
 

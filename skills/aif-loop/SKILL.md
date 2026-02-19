@@ -362,16 +362,59 @@ After the loop stops (any reason):
 
 ## Step 8: Response Format to User
 
-Default strict output after each iteration:
+Show a compact summary after each iteration — do NOT dump full `run.json` or `artifact.md` content into the conversation. The artifact is already on disk; duplicating it wastes context.
 
-1. `run.json` snapshot (current loop state)
-2. `artifact.md` content
-3. `evaluation` result (score, passed, failures)
-4. `critique` block only when `passed=false`
+### Iteration summary format
 
-Keep explanations short outside strict blocks.
+```text
+── Iteration {N}/{max} | Phase {A|B} | Score: {score} | {PASS|FAIL} ──
+Plan: {1-line summary of plan focus}
+Hash: {first 8 chars of artifact SHA-256}
+Changed: {list of added/modified sections, or "initial generation"}
+Failed: {comma-separated rule IDs, or "none"}
+Warnings: {comma-separated rule IDs, or "none"}
+Artifact: .ai-factory/evolution/<alias>/artifact.md
+```
+
+- `Hash` — lets the user verify which version they're looking at without reading the full artifact
+- `Changed` — shows what actually moved between iterations so regressions are visible from the summary alone
+
+If `passed=false`, append a compact critique summary (rule ID + 1-line fix instruction per issue). Do not repeat the full artifact or full evaluation object.
 
 When the loop terminates with `reason=iteration_limit` and `passed=false`, append a compact `distance_to_success` block to the final response.
+
+### Full output exceptions
+
+Show the **full artifact content** (not just summary) in these cases only:
+
+1. **Loop termination** — the final iteration always outputs the complete artifact
+2. **Phase A → B transition** — show the phase-A-passing artifact in full once at the transition boundary for visibility (B-level evaluation still runs immediately per Step 4)
+3. **Explicit user request** — user asks to see the full artifact mid-loop
+
+## Step 9: Context Management
+
+The loop generates significant context per iteration (subagent results, evaluation data, critique). After several iterations the conversation context grows large, degrading LLM quality.
+
+All loop state is persisted to disk — clearing context loses nothing. The `resume` command fully reconstructs state from files.
+
+### When to recommend context clear
+
+Recommend clearing context to the user in these situations:
+
+1. **After iteration 2** — the midpoint of a default 4-iteration loop
+2. **On Phase A → B transition** — natural boundary, new evaluation scope begins
+3. **After any iteration where `iteration >= 3`** — context is already heavy
+
+### How to recommend
+
+After the iteration summary, append:
+
+```text
+💡 Context is growing. Recommended: /clear then /aif-loop resume
+   All state is saved on disk — nothing will be lost.
+```
+
+Do not force or auto-clear. The user decides. If the user ignores the recommendation, continue normally.
 
 ## Error Recovery
 
@@ -402,6 +445,8 @@ If `run.json` is missing or unparseable:
 7. Refiner changes only what is needed to pass failed rules
 8. Start simple and add complexity only when metrics show need
 9. Retry failed phases exactly once before stopping
+10. Use compact iteration summaries by default (Step 8). Full artifact output is allowed only in Step 8 exceptions; never dump full `run.json` into conversation.
+11. Recommend context clear at strategic points (Step 9) — after iteration 2, on phase transition, or when iteration >= 3
 
 ## Examples
 
