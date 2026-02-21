@@ -38,6 +38,22 @@ What would you like to do?
 
 Tasks are persisted in the conversation/project state.
 
+### Recovery after a break or after /clear
+
+If the user is resuming later and you don't have prior conversational context, rebuild context from git + the plan file before continuing:
+
+```
+git status
+git branch --show-current
+git log --oneline --decorate -20
+git diff --stat
+```
+
+Then:
+- Re-open the active plan file and confirm it matches the current branch.
+- Use `TaskList` to find `in_progress` first, otherwise the next pending task.
+- If `TaskList` and plan checkboxes disagree, reconcile (verify code, then update `TaskUpdate` + plan checkbox).
+
 **Starting new session:**
 ```
 User: /aif-implement

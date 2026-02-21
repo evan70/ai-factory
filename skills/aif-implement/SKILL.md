@@ -22,6 +22,24 @@ Execute tasks from the plan, track progress, and enable session continuation.
 3. Check current branch
 ```
 
+### Step 0.0: Resume / Recovery (after a break or after /clear)
+
+If the user is resuming **the next day**, says the session was **abandoned**, or you suspect context was lost (e.g. after `/clear`), rebuild local context from the repo **before** continuing tasks:
+
+```
+1. git status
+2. git branch --show-current
+3. git log --oneline --decorate -20
+4. (optional) git diff --stat
+5. (optional) git stash list
+```
+
+Then reconcile plan/task state:
+- Ensure the current plan file matches the current branch (PLAN.md takes priority; otherwise branch-named plan).
+- Compare `TaskList` statuses vs plan checkboxes.
+  - If code changes for a task appear already implemented but the task is not marked completed, verify quickly and then `TaskUpdate(..., status: "completed")` and update the plan checkbox.
+  - If a task is marked completed but the corresponding code is missing (rebase/reset happened), mark it back to pending and discuss with the user.
+
 **If uncommitted changes exist:**
 ```
 You have uncommitted changes. Commit them first?
