@@ -2,6 +2,7 @@ import { DefaultTransformer } from './transformers/default.js';
 import { KiloCodeTransformer } from './transformers/kilocode.js';
 import { AntigravityTransformer } from './transformers/antigravity.js';
 import { CodexTransformer } from './transformers/codex.js';
+import { QwenTransformer } from './transformers/qwen.js';
 
 export interface TransformResult {
   targetDir: string;
@@ -56,6 +57,7 @@ export function simplifyFrontmatter(content: string): string {
 const registry: Record<string, () => AgentTransformer> = {
   codex: () => new CodexTransformer(),
   kilocode: () => new KiloCodeTransformer(),
+  qwen: () => new QwenTransformer(),
   antigravity: () => new AntigravityTransformer(),
 };
 

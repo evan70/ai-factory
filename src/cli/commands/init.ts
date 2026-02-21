@@ -132,6 +132,7 @@ export async function initCommand(): Promise<void> {
 
     console.log(chalk.bold('\nNext steps:'));
     const includesCodex = installedAgents.some(agent => agent.id === 'codex');
+    const includesQwen = installedAgents.some(agent => agent.id === 'qwen');
 
     for (const [index, agent] of installedAgents.entries()) {
       const agentConfig = getAgentConfig(agent.id);
@@ -148,7 +149,12 @@ export async function initCommand(): Promise<void> {
         console.log(chalk.dim('     Run /aif to analyze project and generate stack-specific skills'));
       }
     }
-    console.log(chalk.dim(`  ${installedAgents.length + 1}. Use /aif-plan and /aif-commit for daily workflow${includesCodex ? ' (Codex CLI: $aif-plan, $aif-commit)' : ''}`));
+    const invocationHints = [
+      includesCodex ? 'Codex CLI: $aif-plan, $aif-commit' : null,
+      includesQwen ? 'Qwen Code: /skills aif-plan, /skills aif-commit' : null,
+    ].filter(Boolean).join('; ');
+
+    console.log(chalk.dim(`  ${installedAgents.length + 1}. Use /aif-plan and /aif-commit for daily workflow${invocationHints ? ` (${invocationHints})` : ''}`));
     console.log('');
 
   } catch (error) {
