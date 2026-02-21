@@ -83,6 +83,13 @@ When invoked:
 3. Propose a commit message
 4. Ask for confirmation or modifications
 5. Execute `git commit` with the message
+6. After a successful commit, offer to push:
+   - Show branch/ahead status: `git status -sb`
+   - If the branch has no upstream, use: `git push -u origin <branch>`
+   - Otherwise: `git push`
+   - User choice:
+     - [ ] Push now
+     - [ ] Skip push
 
 If argument provided (e.g., `/aif-commit auth`):
 - Use it as the scope
