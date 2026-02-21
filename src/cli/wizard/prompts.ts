@@ -19,7 +19,7 @@ export interface WizardAnswers {
 export async function runWizard(projectDir: string, defaultAgentIds: string[] = []): Promise<WizardAnswers> {
   const detectedStack = await detectStack(projectDir);
   const availableSkills = await getAvailableSkills();
-  const selectedByDefault = new Set(defaultAgentIds.length > 0 ? defaultAgentIds : ['claude']);
+  const selectedByDefault = new Set(defaultAgentIds);
 
   if (detectedStack) {
     console.log(`\n📦 Detected: ${detectedStack.name}`);
@@ -77,7 +77,7 @@ export async function runWizard(projectDir: string, defaultAgentIds: string[] = 
           type: 'confirm',
           name: 'configureMcp',
           message: `[${agentConfig.displayName}] Configure MCP servers?`,
-          default: detectedStack !== null,
+          default: false,
         },
       ]);
 
@@ -90,13 +90,13 @@ export async function runWizard(projectDir: string, defaultAgentIds: string[] = 
             type: 'confirm',
             name: 'mcpGithub',
             message: `[${agentConfig.displayName}] GitHub MCP (PRs, issues, repo operations)?`,
-            default: true,
+            default: false,
           },
           {
             type: 'confirm',
             name: 'mcpPostgres',
-            message: `[${agentConfig.displayName}] Postgres MCP (database queries)?`,
-            default: suggestPostgres,
+            message: `[${agentConfig.displayName}] Postgres MCP (database queries)?${suggestPostgres ? ' (recommended for this stack)' : ''}`,
+            default: false,
           },
           {
             type: 'confirm',
