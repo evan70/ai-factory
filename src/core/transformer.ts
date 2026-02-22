@@ -14,7 +14,14 @@ export interface TransformResult {
 export interface AgentTransformer {
   transform(skillName: string, content: string): TransformResult;
   postInstall?(projectDir: string): Promise<void>;
-  getWelcomeMessage?(): string[];
+  getWelcomeMessage(): string[];
+  getInvocationHint?(): string;
+  cleanup?(projectDir: string, skillsDir: string): Promise<void>;
+}
+
+export interface AgentOnboarding {
+  welcomeMessage: string[];
+  invocationHint: string | null;
 }
 
 export const WORKFLOW_SKILLS = new Set([
@@ -54,6 +61,18 @@ export function simplifyFrontmatter(content: string): string {
   return content.replace(/^---\n[\s\S]*?\n---/, newFrontmatter);
 }
 
+const INVOCATION_PATTERN = /(^|[^A-Za-z0-9_-])\/(aif(?:-[a-z0-9-]+)?)/g;
+
+export function rewriteInvocationPrefix(
+  content: string,
+  mapInvocation: (invocation: string) => string,
+): string {
+  return content.replace(
+    INVOCATION_PATTERN,
+    (_match, prefix: string, invocation: string) => `${prefix}${mapInvocation(invocation)}`,
+  );
+}
+
 const registry: Record<string, () => AgentTransformer> = {
   codex: () => new CodexTransformer(),
   kilocode: () => new KiloCodeTransformer(),
@@ -64,4 +83,17 @@ const registry: Record<string, () => AgentTransformer> = {
 export function getTransformer(agentId: string): AgentTransformer {
   const factory = registry[agentId];
   return factory ? factory() : new DefaultTransformer();
+}
+
+export function getAgentOnboarding(agentId: string): AgentOnboarding {
+  const transformer = getTransformer(agentId);
+  return {
+    welcomeMessage: transformer.getWelcomeMessage(),
+    invocationHint: transformer.getInvocationHint?.() ?? null,
+  };
+}
+
+export async function cleanupAgentSetup(agentId: string, projectDir: string, skillsDir: string): Promise<void> {
+  const transformer = getTransformer(agentId);
+  await transformer.cleanup?.(projectDir, skillsDir);
 }

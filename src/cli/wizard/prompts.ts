@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { detectStack, type DetectedStack } from './detector.js';
+import { detectStack } from './detector.js';
 import { getAvailableSkills } from '../../core/installer.js';
 import { getAgentConfig, getAgentChoices } from '../../core/agents.js';
 

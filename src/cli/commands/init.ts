@@ -5,34 +5,12 @@ import { installSkills } from '../../core/installer.js';
 import { saveConfig, configExists, loadConfig, getCurrentVersion, type AgentInstallation } from '../../core/config.js';
 import { configureMcp, getMcpInstructions } from '../../core/mcp.js';
 import { getAgentConfig } from '../../core/agents.js';
-import { getTransformer } from '../../core/transformer.js';
-import { WORKFLOW_SKILLS } from '../../core/transformer.js';
-import { fileExists, removeDirectory, removeFile } from '../../utils/fs.js';
+import { cleanupAgentSetup, getAgentOnboarding } from '../../core/transformer.js';
+import { removeDirectory } from '../../utils/fs.js';
 
 async function removeAgentSetup(projectDir: string, agent: AgentInstallation): Promise<void> {
-  const agentConfig = getAgentConfig(agent.id);
-
   await removeDirectory(path.join(projectDir, agent.skillsDir));
-
-  if (agent.id === 'antigravity') {
-    const workflowsDir = path.join(projectDir, agentConfig.configDir, 'workflows');
-    for (const workflow of WORKFLOW_SKILLS) {
-      const workflowFile = path.join(workflowsDir, `${workflow}.md`);
-      if (await fileExists(workflowFile)) {
-        await removeFile(workflowFile);
-      }
-    }
-
-    for (const ruleFile of ['aif-guardrails.md', 'aif-conventions.md']) {
-      const rulePath = path.join(projectDir, agentConfig.configDir, 'rules', ruleFile);
-      if (await fileExists(rulePath)) {
-        await removeFile(rulePath);
-      }
-    }
-  }
-
-  // Keep agent settings file intact: it may contain user-managed configuration
-  // unrelated to AI Factory.
+  await cleanupAgentSetup(agent.id, projectDir, agent.skillsDir);
 }
 
 export async function initCommand(): Promise<void> {
@@ -131,28 +109,24 @@ export async function initCommand(): Promise<void> {
     }
 
     console.log(chalk.bold('\nNext steps:'));
-    const includesCodex = installedAgents.some(agent => agent.id === 'codex');
-    const includesQwen = installedAgents.some(agent => agent.id === 'qwen');
+    const onboardingByAgent = installedAgents.map(agent => ({
+      agent,
+      onboarding: getAgentOnboarding(agent.id),
+    }));
 
-    for (const [index, agent] of installedAgents.entries()) {
+    for (const [index, { agent, onboarding }] of onboardingByAgent.entries()) {
       const agentConfig = getAgentConfig(agent.id);
-      const transformer = getTransformer(agent.id);
-      const welcomeMessage = transformer.getWelcomeMessage?.();
 
       console.log(chalk.dim(`  ${index + 1}. ${agentConfig.displayName}`));
-      if (welcomeMessage) {
-        for (const line of welcomeMessage) {
-          console.log(chalk.dim(`     ${line}`));
-        }
-      } else {
-        console.log(chalk.dim('     Open the agent in this directory'));
-        console.log(chalk.dim('     Run /aif to analyze project and generate stack-specific skills'));
+      for (const line of onboarding.welcomeMessage) {
+        console.log(chalk.dim(`     ${line}`));
       }
     }
-    const invocationHints = [
-      includesCodex ? 'Codex CLI: $aif-plan, $aif-commit' : null,
-      includesQwen ? 'Qwen Code: /skills aif-plan, /skills aif-commit' : null,
-    ].filter(Boolean).join('; ');
+
+    const invocationHints = onboardingByAgent
+      .map(({ onboarding }) => onboarding.invocationHint)
+      .filter(Boolean)
+      .join('; ');
 
     console.log(chalk.dim(`  ${installedAgents.length + 1}. Use /aif-plan and /aif-commit for daily workflow${invocationHints ? ` (${invocationHints})` : ''}`));
     console.log('');

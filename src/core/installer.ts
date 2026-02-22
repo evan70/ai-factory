@@ -88,20 +88,22 @@ export async function installSkills(options: InstallOptions): Promise<string[]> 
   return installedSkills;
 }
 
+export function partitionSkills(skills: string[]): { base: string[], custom: string[] } {
+  return {
+    base: skills.filter(s => !s.includes('/')),
+    custom: skills.filter(s => s.includes('/')),
+  };
+}
+
 export async function getAvailableSkills(): Promise<string[]> {
   const packageSkillsDir = getSkillsDir();
   const dirs = await listDirectories(packageSkillsDir);
   return dirs.filter(dir => !dir.startsWith('_'));
 }
 
-export async function getAvailableTemplates(): Promise<string[]> {
-  const templatesDir = path.join(getSkillsDir(), '_templates');
-  return listDirectories(templatesDir);
-}
-
 export async function updateSkills(agentInstallation: AgentInstallation, projectDir: string): Promise<string[]> {
   const availableSkills = await getAvailableSkills();
-  const customSkills = agentInstallation.installedSkills.filter(s => s.includes('/'));
+  const { custom } = partitionSkills(agentInstallation.installedSkills);
 
   const installedBaseSkills = await installSkills({
     projectDir,
@@ -111,5 +113,5 @@ export async function updateSkills(agentInstallation: AgentInstallation, project
     agentId: agentInstallation.id,
   });
 
-  return [...installedBaseSkills, ...customSkills];
+  return [...installedBaseSkills, ...custom];
 }

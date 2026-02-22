@@ -14,20 +14,19 @@ interface OpenCodeMcpServerConfig {
   environment?: Record<string, string>;
 }
 
-interface McpSettings {
-  mcpServers?: Record<string, McpServerConfig>;
-}
-
-interface OpenCodeSettings {
-  [key: string]: unknown;
-  mcp?: Record<string, OpenCodeMcpServerConfig>;
-}
-
 export interface McpOptions {
   github: boolean;
   filesystem: boolean;
   postgres: boolean;
   chromeDevtools: boolean;
+}
+
+type McpSettingsFormat = 'standard' | 'opencode';
+
+interface McpServerDefinition {
+  key: keyof McpOptions;
+  templateFile: string;
+  instruction: string;
 }
 
 function toOpenCodeFormat(config: McpServerConfig): OpenCodeMcpServerConfig {
@@ -39,6 +38,66 @@ function toOpenCodeFormat(config: McpServerConfig): OpenCodeMcpServerConfig {
   return result;
 }
 
+const MCP_SERVERS: McpServerDefinition[] = [
+  {
+    key: 'github',
+    templateFile: 'github.json',
+    instruction: 'GitHub MCP: Set GITHUB_TOKEN environment variable with your GitHub personal access token',
+  },
+  {
+    key: 'filesystem',
+    templateFile: 'filesystem.json',
+    instruction: 'Filesystem MCP: No additional configuration needed. Server provides file access tools.',
+  },
+  {
+    key: 'postgres',
+    templateFile: 'postgres.json',
+    instruction: 'Postgres MCP: Set DATABASE_URL environment variable with your PostgreSQL connection string',
+  },
+  {
+    key: 'chromeDevtools',
+    templateFile: 'chrome-devtools.json',
+    instruction: 'Chrome Devtools MCP: No additional configuration needed. Server provides your coding agent control and inspect a live Chrome browser.',
+  },
+];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function ensureNestedRecord(object: Record<string, unknown>, key: string): Record<string, unknown> {
+  const value = object[key];
+  if (isRecord(value)) {
+    return value;
+  }
+  const next: Record<string, unknown> = {};
+  object[key] = next;
+  return next;
+}
+
+async function loadSettings(settingsPath: string): Promise<Record<string, unknown>> {
+  if (!(await fileExists(settingsPath))) {
+    return {};
+  }
+
+  const parsed = await readJsonFile<unknown>(settingsPath);
+  return isRecord(parsed) ? parsed : {};
+}
+
+function applyServerConfig(
+  settings: Record<string, unknown>,
+  format: McpSettingsFormat,
+  key: keyof McpOptions,
+  template: McpServerConfig,
+): void {
+  if (format === 'opencode') {
+    ensureNestedRecord(settings, 'mcp')[key] = toOpenCodeFormat(template);
+    return;
+  }
+
+  ensureNestedRecord(settings, 'mcpServers')[key] = template;
+}
+
 export async function configureMcp(projectDir: string, options: McpOptions, agentId: string = 'claude'): Promise<string[]> {
   const agent = getAgentConfig(agentId);
 
@@ -46,7 +105,7 @@ export async function configureMcp(projectDir: string, options: McpOptions, agen
     return [];
   }
 
-  const isOpenCode = agentId === 'opencode';
+  const format: McpSettingsFormat = agentId === 'opencode' ? 'opencode' : 'standard';
   const configuredServers: string[] = [];
   const settingsPath = path.join(projectDir, agent.settingsFile);
   const settingsDir = path.dirname(settingsPath);
@@ -54,104 +113,32 @@ export async function configureMcp(projectDir: string, options: McpOptions, agen
   await ensureDir(settingsDir);
 
   const mcpTemplatesDir = path.join(getMcpDir(), 'templates');
+  const settings = await loadSettings(settingsPath);
 
-  if (isOpenCode) {
-    let settings: OpenCodeSettings = {};
-    if (await fileExists(settingsPath)) {
-      const existing = await readJsonFile<OpenCodeSettings>(settingsPath);
-      if (existing) {
-        settings = existing;
-      }
+  for (const server of MCP_SERVERS) {
+    if (!options[server.key]) {
+      continue;
     }
 
-    if (!settings.mcp) {
-      settings.mcp = {};
+    const template = await readJsonFile<McpServerConfig>(path.join(mcpTemplatesDir, server.templateFile));
+    if (!template) {
+      continue;
     }
 
-    const serverEntries: [string, string][] = [
-      ['github', 'github.json'],
-      ['filesystem', 'filesystem.json'],
-      ['postgres', 'postgres.json'],
-      ['chromeDevtools', 'chrome-devtools.json'],
-    ];
+    applyServerConfig(settings, format, server.key, template);
+    configuredServers.push(server.key);
+  }
 
-    for (const [key, file] of serverEntries) {
-      if (options[key as keyof McpOptions]) {
-        const template = await readJsonFile<McpServerConfig>(path.join(mcpTemplatesDir, file));
-        if (template) {
-          settings.mcp[key] = toOpenCodeFormat(template);
-          configuredServers.push(key);
-        }
-      }
-    }
-
-    if (configuredServers.length > 0) {
-      await writeJsonFile(settingsPath, settings);
-    }
-  } else {
-    let settings: McpSettings = {};
-    if (await fileExists(settingsPath)) {
-      const existing = await readJsonFile<McpSettings>(settingsPath);
-      if (existing) {
-        settings = existing;
-      }
-    }
-
-    if (!settings.mcpServers) {
-      settings.mcpServers = {};
-    }
-
-    const serverEntries: [string, string][] = [
-      ['github', 'github.json'],
-      ['filesystem', 'filesystem.json'],
-      ['postgres', 'postgres.json'],
-      ['chromeDevtools', 'chrome-devtools.json'],
-    ];
-
-    for (const [key, file] of serverEntries) {
-      if (options[key as keyof McpOptions]) {
-        const template = await readJsonFile<McpServerConfig>(path.join(mcpTemplatesDir, file));
-        if (template) {
-          settings.mcpServers[key] = template;
-          configuredServers.push(key);
-        }
-      }
-    }
-
-    if (configuredServers.length > 0) {
-      await writeJsonFile(settingsPath, settings);
-    }
+  if (configuredServers.length > 0) {
+    await writeJsonFile(settingsPath, settings);
   }
 
   return configuredServers;
 }
 
 export function getMcpInstructions(servers: string[]): string[] {
-  const instructions: string[] = [];
-
-  if (servers.includes('github')) {
-    instructions.push(
-      'GitHub MCP: Set GITHUB_TOKEN environment variable with your GitHub personal access token'
-    );
-  }
-
-  if (servers.includes('filesystem')) {
-    instructions.push(
-      'Filesystem MCP: No additional configuration needed. Server provides file access tools.'
-    );
-  }
-
-  if (servers.includes('postgres')) {
-    instructions.push(
-      'Postgres MCP: Set DATABASE_URL environment variable with your PostgreSQL connection string'
-    );
-  }
-
-  if (servers.includes('chromeDevtools')) {
-    instructions.push(
-        'Chrome Devtools MCP: No additional configuration needed. Server provides your coding agent control and inspect a live Chrome browser.'
-    );
-  }
-
-  return instructions;
+  const selected = new Set(servers);
+  return MCP_SERVERS
+    .filter(server => selected.has(server.key))
+    .map(server => server.instruction);
 }

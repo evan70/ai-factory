@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import path from 'path';
 import { loadConfig, saveConfig, getCurrentVersion } from '../../core/config.js';
-import { installSkills, getAvailableSkills } from '../../core/installer.js';
+import { installSkills, getAvailableSkills, partitionSkills } from '../../core/installer.js';
 import { getAgentConfig } from '../../core/agents.js';
 import { fileExists, removeDirectory, removeFile } from '../../utils/fs.js';
 
@@ -67,6 +67,43 @@ const OLD_WORKFLOW_SKILLS = new Set([
   'verify',
 ]);
 
+async function removeWorkflowFile(projectDir: string, configDir: string, skillName: string): Promise<boolean> {
+  const flatFile = path.join(projectDir, configDir, 'workflows', `${skillName}.md`);
+  if (await fileExists(flatFile)) {
+    await removeFile(flatFile);
+    return true;
+  }
+  return false;
+}
+
+interface LegacySkillRemovalOptions {
+  projectDir: string;
+  configDir: string;
+  skillsDir: string;
+  agentId: string;
+  skillName: string;
+  removeWorkflow: boolean;
+}
+
+async function removeLegacySkillArtifacts(options: LegacySkillRemovalOptions): Promise<number> {
+  const { projectDir, configDir, skillsDir, agentId, skillName, removeWorkflow } = options;
+  let removedCount = 0;
+
+  if (removeWorkflow && await removeWorkflowFile(projectDir, configDir, skillName)) {
+    console.log(chalk.yellow(`  [${agentId}] Removed workflow: ${skillName}.md`));
+    removedCount++;
+  }
+
+  const oldDir = path.join(skillsDir, skillName);
+  if (await fileExists(oldDir)) {
+    await removeDirectory(oldDir);
+    console.log(chalk.yellow(`  [${agentId}] Removed skill: ${skillName}/`));
+    removedCount++;
+  }
+
+  return removedCount;
+}
+
 export async function upgradeCommand(): Promise<void> {
   const projectDir = process.cwd();
 
@@ -112,49 +149,32 @@ export async function upgradeCommand(): Promise<void> {
     console.log(chalk.dim(`Scanning for old-format skills [${agent.id}]...\n`));
 
     for (const oldName of OLD_SKILL_NAMES) {
-      // Antigravity: old workflow skills were flat files in workflows/
-      if (isAntigravity && OLD_WORKFLOW_SKILLS.has(oldName)) {
-        const flatFile = path.join(projectDir, agentConfig.configDir, 'workflows', `${oldName}.md`);
-        if (await fileExists(flatFile)) {
-          await removeFile(flatFile);
-          console.log(chalk.yellow(`  [${agent.id}] Removed workflow: ${oldName}.md`));
-          removedCount++;
-        }
-      }
-
-      // All agents: remove old skill directory
-      const oldDir = path.join(skillsDir, oldName);
-      if (await fileExists(oldDir)) {
-        await removeDirectory(oldDir);
-        console.log(chalk.yellow(`  [${agent.id}] Removed skill: ${oldName}/`));
-        removedCount++;
-      }
+      removedCount += await removeLegacySkillArtifacts({
+        projectDir,
+        configDir: agentConfig.configDir,
+        skillsDir,
+        agentId: agent.id,
+        skillName: oldName,
+        removeWorkflow: isAntigravity && OLD_WORKFLOW_SKILLS.has(oldName),
+      });
     }
 
     // Remove old aif-task, aif-feature, and ai-factory-* skills
-    const obsoleteSkills = [
+    const obsoleteSkills = Array.from(new Set([
       'aif-task', 'aif-feature',
       ...OLD_SKILL_NAMES.map(n => `ai-factory-${n}`),
       ...OLD_AIF_PREFIX_SKILL_NAMES,
-    ];
+    ]));
 
     for (const oldSkill of obsoleteSkills) {
-      const oldDir = path.join(skillsDir, oldSkill);
-      if (await fileExists(oldDir)) {
-        await removeDirectory(oldDir);
-        console.log(chalk.yellow(`  [${agent.id}] Removed skill: ${oldSkill}/`));
-        removedCount++;
-      }
-
-      // Antigravity: remove flat workflow files
-      if (isAntigravity) {
-        const flatFile = path.join(projectDir, agentConfig.configDir, 'workflows', `${oldSkill}.md`);
-        if (await fileExists(flatFile)) {
-          await removeFile(flatFile);
-          console.log(chalk.yellow(`  [${agent.id}] Removed workflow: ${oldSkill}.md`));
-          removedCount++;
-        }
-      }
+      removedCount += await removeLegacySkillArtifacts({
+        projectDir,
+        configDir: agentConfig.configDir,
+        skillsDir,
+        agentId: agent.id,
+        skillName: oldSkill,
+        removeWorkflow: isAntigravity,
+      });
     }
 
     if (removedCount === 0) {
@@ -165,7 +185,7 @@ export async function upgradeCommand(): Promise<void> {
 
     console.log(chalk.dim(`Installing new-format skills [${agent.id}]...\n`));
 
-    const customSkills = agent.installedSkills.filter(s => s.includes('/'));
+    const { custom: customSkills } = partitionSkills(agent.installedSkills);
     const installedSkills = await installSkills({
       projectDir,
       skillsDir: agent.skillsDir,
@@ -186,8 +206,7 @@ export async function upgradeCommand(): Promise<void> {
   console.log(chalk.green('✓ Upgrade to v2 complete!\n'));
 
   for (const agent of config.agents) {
-    const baseSkills = agent.installedSkills.filter(s => !s.includes('/'));
-    const customSkills = agent.installedSkills.filter(s => s.includes('/'));
+    const { base: baseSkills, custom: customSkills } = partitionSkills(agent.installedSkills);
 
     console.log(chalk.bold(`[${agent.id}] Installed skills:`));
     for (const skill of baseSkills) {

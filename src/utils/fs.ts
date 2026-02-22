@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function getPackageRoot(): string {
+function getPackageRoot(): string {
   return path.resolve(__dirname, '..', '..');
 }
 
@@ -19,11 +19,6 @@ export function getMcpDir(): string {
 
 export async function copyDirectory(src: string, dest: string): Promise<void> {
   await fs.ensureDir(dest);
-  await fs.copy(src, dest, { overwrite: true });
-}
-
-export async function copyFile(src: string, dest: string): Promise<void> {
-  await fs.ensureDir(path.dirname(dest));
   await fs.copy(src, dest, { overwrite: true });
 }
 

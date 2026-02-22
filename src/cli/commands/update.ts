@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { loadConfig, saveConfig, getCurrentVersion } from '../../core/config.js';
-import { updateSkills, getAvailableSkills } from '../../core/installer.js';
+import {getCurrentVersion, loadConfig, saveConfig} from '../../core/config.js';
+import {getAvailableSkills, partitionSkills, updateSkills} from '../../core/installer.js';
 
 export async function updateCommand(): Promise<void> {
   const projectDir = process.cwd();
@@ -27,7 +27,7 @@ export async function updateCommand(): Promise<void> {
     const previousBaseSkillsByAgent = new Map<string, string[]>();
 
     for (const agent of config.agents) {
-      const previousBaseSkills = agent.installedSkills.filter(s => !s.includes('/'));
+      const { base: previousBaseSkills } = partitionSkills(agent.installedSkills);
       previousBaseSkillsByAgent.set(agent.id, previousBaseSkills);
       const newSkills = availableSkills.filter(s => !previousBaseSkills.includes(s));
 
@@ -40,8 +40,7 @@ export async function updateCommand(): Promise<void> {
     }
 
     for (const agent of config.agents) {
-      const updatedSkills = await updateSkills(agent, projectDir);
-      agent.installedSkills = updatedSkills;
+      agent.installedSkills = await updateSkills(agent, projectDir);
     }
     config.version = currentVersion;
     await saveConfig(projectDir, config);
@@ -52,8 +51,7 @@ export async function updateCommand(): Promise<void> {
     for (const agent of config.agents) {
       const previousBaseSkills = previousBaseSkillsByAgent.get(agent.id) ?? [];
       const newSkills = availableSkills.filter(s => !previousBaseSkills.includes(s));
-      const baseSkills = agent.installedSkills.filter(s => !s.includes('/'));
-      const customSkills = agent.installedSkills.filter(s => s.includes('/'));
+      const { base: baseSkills, custom: customSkills } = partitionSkills(agent.installedSkills);
 
       console.log(chalk.bold(`\n[${agent.id}] Base skills:`));
       for (const skill of baseSkills) {

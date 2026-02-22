@@ -65,7 +65,7 @@ export async function detectStack(projectDir: string): Promise<DetectedStack | n
   return null;
 }
 
-async function detectJavaScriptStack(packageJson: PackageJson, projectDir: string): Promise<DetectedStack> {
+async function detectJavaScriptStack(packageJson: PackageJson, _projectDir: string): Promise<DetectedStack> {
   const allDeps = {
     ...packageJson.dependencies,
     ...packageJson.devDependencies,
@@ -80,8 +80,6 @@ async function detectJavaScriptStack(packageJson: PackageJson, projectDir: strin
 
   if (allDeps['next']) {
     frameworks.push('next.js');
-    const hasAppDir = await fileExists(path.join(projectDir, 'app'));
-    const hasPagesDir = await fileExists(path.join(projectDir, 'pages'));
 
     return {
       name: 'nextjs',
@@ -232,51 +230,4 @@ async function detectPythonStack(projectDir: string): Promise<DetectedStack> {
     frameworks,
     languages,
   };
-}
-
-export function getRecommendedSkills(stack: DetectedStack | null): string[] {
-  const baseSkills = [
-    'aif',
-    'aif-skill-generator',
-    'aif-plan',
-    'aif-implement',
-    'aif-commit',
-    'aif-review',
-    'aif-best-practices',
-    'aif-architecture',
-    'aif-security-checklist',
-  ];
-
-  if (!stack) {
-    return baseSkills;
-  }
-
-  const skills = [...baseSkills];
-
-  if (['nextjs', 'react', 'vue', 'node-api', 'fastapi', 'django', 'flask', 'laravel', 'symfony'].includes(stack.name)) {
-    skills.push('aif-deploy');
-  }
-
-  return skills;
-}
-
-export function getRecommendedTemplate(stack: DetectedStack | null): string | null {
-  if (!stack) return null;
-
-  const templateMap: Record<string, string> = {
-    'nextjs': 'nextjs',
-    'react': 'react',
-    'node-api': 'node-api',
-    'node': 'node-api',
-    'python': 'python',
-    'django': 'python',
-    'fastapi': 'python',
-    'flask': 'python',
-    'php': 'php',
-    'laravel': 'php',
-    'symfony': 'php',
-    'slim': 'php',
-  };
-
-  return templateMap[stack.name] || null;
 }

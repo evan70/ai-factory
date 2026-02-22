@@ -36,7 +36,7 @@ interface LegacyAiFactoryConfig {
 const CONFIG_FILENAME = '.ai-factory.json';
 const CURRENT_VERSION: string = pkg.version;
 
-export function getConfigPath(projectDir: string): string {
+function getConfigPath(projectDir: string): string {
   return path.join(projectDir, CONFIG_FILENAME);
 }
 
@@ -56,14 +56,6 @@ function createAgentInstallation(agentId: string, legacy?: LegacyAiFactoryConfig
     id: agentId,
     installedSkills: legacy?.installedSkills ?? [],
     mcp: normalizeMcp(legacy?.mcp),
-  };
-}
-
-export function createDefaultConfig(agentIds: string[] = ['claude']): AiFactoryConfig {
-  const uniqueAgentIds = Array.from(new Set(agentIds));
-  return {
-    version: CURRENT_VERSION,
-    agents: uniqueAgentIds.map(id => createAgentInstallation(id)),
   };
 }
 

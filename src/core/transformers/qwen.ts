@@ -1,7 +1,8 @@
 import type { AgentTransformer, TransformResult } from '../transformer.js';
+import { rewriteInvocationPrefix } from '../transformer.js';
 
 function toQwenInvocation(content: string): string {
-  return content.replace(/(^|[^A-Za-z0-9_-])\/(aif(?:-[a-z0-9-]+)?)/g, '$1/skills $2');
+  return rewriteInvocationPrefix(content, invocation => `/skills ${invocation}`);
 }
 
 export class QwenTransformer implements AgentTransformer {
@@ -21,5 +22,8 @@ export class QwenTransformer implements AgentTransformer {
       '3. Run /skills aif to analyze project and generate stack-specific skills',
     ];
   }
-}
 
+  getInvocationHint(): string {
+    return 'Qwen Code: /skills aif-plan, /skills aif-commit';
+  }
+}
