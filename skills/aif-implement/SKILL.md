@@ -48,7 +48,23 @@ You have uncommitted changes. Commit them first?
 - [ ] Cancel
 ```
 
-**If NO plan file exists (all tasks completed or fresh start):**
+**If NO plan file exists but `.ai-factory/FIX_PLAN.md` exists:**
+
+A fix plan was created by `/aif-fix` in plan mode. Redirect to fix workflow:
+
+```
+Found a fix plan (.ai-factory/FIX_PLAN.md).
+
+This plan was created by /aif-fix and should be executed through the fix workflow
+(it creates a patch and handles cleanup automatically).
+
+Running /aif-fix to execute the plan...
+```
+
+→ **Invoke `/aif-fix`** (without arguments — it will detect FIX_PLAN.md and execute it).
+→ **STOP** — do not continue with implement workflow.
+
+**If NO plan file exists AND no FIX_PLAN.md (all tasks completed or fresh start):**
 
 ```
 No active plan found.
@@ -108,11 +124,14 @@ Based on choice:
 2. No .ai-factory/PLAN.md → Check current git branch:
    git branch --show-current
    → Look for .ai-factory/plans/<branch-name>.md (e.g., .ai-factory/plans/feature-user-auth.md)
+3. No plan files at all → Check .ai-factory/FIX_PLAN.md
+   → If exists: invoke /aif-fix (handles its own workflow with patches) and STOP
 ```
 
 **Priority:**
 1. `.ai-factory/PLAN.md` - always takes priority (from `/aif-plan fast`)
 2. Branch-named file - if no .ai-factory/PLAN.md (from `/aif-plan full`)
+3. `.ai-factory/FIX_PLAN.md` - redirect to `/aif-fix` (from `/aif-fix` plan mode)
 
 **Read the plan file** to understand:
 - Context and settings (testing, logging preferences)
