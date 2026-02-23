@@ -99,5 +99,10 @@ If argument provided (e.g., `/aif-commit auth`):
 
 - Never commit secrets or credentials
 - Review large diffs carefully before committing
-- Suggest splitting if changes are unrelated
+- If staged changes contain unrelated work (e.g., a feature + a bugfix, or changes to independent modules), suggest splitting into separate commits:
+  1. Show which files/hunks belong to which commit
+  2. Ask for confirmation
+  3. Unstage all: `git reset HEAD`
+  4. Stage and commit each group separately using `git add <files>` + `git commit`
+  5. Offer to push only after all commits are done
 - Add Co-Authored-By for pair programming if mentioned
