@@ -96,7 +96,7 @@ function isGitUrl(source: string): boolean {
 }
 
 function isLocalPath(source: string): boolean {
-  return source.startsWith('./') || source.startsWith('/') || source.startsWith('../');
+  return source.startsWith('./') || source.startsWith('/') || source.startsWith('../') || path.isAbsolute(source);
 }
 
 export async function installExtensionFromLocal(projectDir: string, sourcePath: string): Promise<ExtensionManifest> {
