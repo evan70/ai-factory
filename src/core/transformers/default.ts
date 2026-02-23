@@ -13,7 +13,7 @@ export class DefaultTransformer implements AgentTransformer {
   getWelcomeMessage(): string[] {
     return [
       '1. Open the agent in this directory',
-      '2. Run /aif to analyze project and generate stack-specific skills',
+      '2. Run /aif to analyze project and generate project-relevant skills',
     ];
   }
 }

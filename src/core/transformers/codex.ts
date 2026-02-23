@@ -18,7 +18,7 @@ export class CodexTransformer implements AgentTransformer {
   getWelcomeMessage(): string[] {
     return [
       '1. Open Codex CLI in this directory',
-      '2. Run $aif to analyze project and generate stack-specific skills',
+      '2. Run $aif to analyze project and generate project-relevant skills',
     ];
   }
 

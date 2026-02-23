@@ -66,7 +66,7 @@ Refine an existing plan with a second iteration:
 ### `/aif-loop [new|resume|status|stop|list|history|clean] [task or alias]`
 Runs a strict iterative Reflex Loop with phase-based execution and quality gates:
 ```
-/aif-loop new OpenAPI 3.1 + DDD notes + JSON examples + PHP controller
+/aif-loop new OpenAPI 3.1 spec + DDD notes + JSON examples
 /aif-loop resume
 /aif-loop status
 /aif-loop stop
@@ -161,7 +161,7 @@ Self-improve skills based on project experience:
 
 ### `/aif`
 Analyzes your project and sets up context:
-- Scans project files to detect stack
+- Scans project files to understand the codebase
 - Searches [skills.sh](https://skills.sh) for relevant skills
 - Generates custom skills via `/aif-skill-generator`
 - Configures MCP servers
@@ -169,7 +169,7 @@ Analyzes your project and sets up context:
 
 When called with a description:
 ```
-/aif e-commerce platform with Stripe and Next.js
+/aif project management tool with GitHub integration
 ```
 - Creates `.ai-factory/DESCRIPTION.md` with enhanced project specification
 - Creates `.ai-factory/ARCHITECTURE.md` with architecture decisions and guidelines
@@ -337,7 +337,7 @@ Creates conventional commits:
 ### `/aif-skill-generator`
 Generates new skills:
 ```
-/aif-skill-generator api-patterns
+/aif-skill-generator project-api
 ```
 - Creates SKILL.md with proper frontmatter
 - Follows [Agent Skills](https://agentskills.io) specification
@@ -345,8 +345,8 @@ Generates new skills:
 
 **Learn Mode** — pass URLs to generate skills from real documentation:
 ```
-/aif-skill-generator https://fastapi.tiangolo.com/tutorial/
-/aif-skill-generator https://react.dev/learn https://react.dev/reference/react/hooks
+/aif-skill-generator https://docs.example.com/tutorial/
+/aif-skill-generator https://docs.example.com/guide https://docs.example.com/reference
 /aif-skill-generator my-skill https://docs.example.com/api
 ```
 - Fetches and deeply studies each URL

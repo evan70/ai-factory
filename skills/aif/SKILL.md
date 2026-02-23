@@ -112,9 +112,6 @@ Based on analysis, create project specification:
 
 | Detection | Skills | MCP |
 |-----------|--------|-----|
-| Next.js/React | `nextjs-patterns` | - |
-| Express/Fastify/Hono | `api-patterns` | - |
-| Laravel/Symfony | `php-patterns` | `postgres` |
 | Prisma/PostgreSQL | `db-migrations` | `postgres` |
 | MongoDB | `mongo-patterns` | - |
 | GitHub repo (.git) | - | `github` |
@@ -123,8 +120,7 @@ Based on analysis, create project specification:
 **Step 4: Search skills.sh**
 
 ```bash
-npx skills search nextjs
-npx skills search prisma
+npx skills search <relevant-keyword>
 ```
 
 **Step 5: Present Plan & Confirm**
@@ -132,20 +128,19 @@ npx skills search prisma
 ```markdown
 ## 🏭 Project Analysis
 
-**Detected Stack:** Next.js 14, TypeScript, PostgreSQL (Prisma)
+**Detected Stack:** [language], [framework], [database if any]
 
 ## Setup Plan
 
 ### Skills
 **From skills.sh:**
-- nextjs-app-router ✓
+- [matched skills] ✓
 
 **Generate custom:**
-- project-api (specific to this project's routes)
+- [project-specific skills]
 
 ### MCP Servers
-- [x] GitHub
-- [x] Postgres
+- [x] [relevant MCP servers]
 
 Proceed? [Y/n]
 ```
@@ -172,54 +167,22 @@ Proceed? [Y/n]
 
 ### Mode 2: New Project with Description
 
-**Trigger:** `/aif e-commerce with Stripe payments`
+**Trigger:** `/aif <project description>`
 
 **Step 1: Interactive Stack Selection**
 
 Based on project description, ask user to confirm stack choices.
-Show YOUR recommendation with "(Recommended)" label.
+Show YOUR recommendation with "(Recommended)" label, tailored to the project type.
 
-```
-Based on your project, I recommend:
-
-1. Language:
-   - [ ] TypeScript (Recommended) — type safety, great tooling
-   - [ ] JavaScript — simpler, faster start
-   - [ ] Python — good for ML/data projects
-   - [ ] PHP — Laravel ecosystem
-   - [ ] Go — high performance APIs
-   - [ ] Other: ___
-
-2. Framework:
-   - [ ] Next.js (Recommended) — full-stack React, great DX
-   - [ ] Express — minimal, flexible
-   - [ ] Fastify — fast, schema validation
-   - [ ] Hono — edge-ready, lightweight
-   - [ ] Laravel — batteries included (PHP)
-   - [ ] Django/FastAPI — Python web
-   - [ ] Other: ___
-
-3. Database:
-   - [ ] PostgreSQL (Recommended) — reliable, feature-rich
-   - [ ] MySQL — widely supported
-   - [ ] MongoDB — flexible schema
-   - [ ] SQLite — simple, file-based
-   - [ ] Supabase — Postgres + auth + realtime
-   - [ ] Other: ___
-
-4. ORM/Query Builder:
-   - [ ] Prisma (Recommended) — type-safe, great DX
-   - [ ] Drizzle — lightweight, SQL-like
-   - [ ] TypeORM — decorator-based
-   - [ ] Eloquent — Laravel default
-   - [ ] None — raw queries
-```
+Ask about:
+1. **Language** — recommend based on project needs (performance, ecosystem, team experience)
+2. **Framework** — recommend based on project type (if applicable — not all projects need one)
+3. **Database** — recommend based on data model (if applicable)
+4. **ORM/Query Builder** — recommend based on language and database (if applicable)
 
 **Why these recommendations:**
-- Explain WHY you recommend each choice based on project type
-- E-commerce → PostgreSQL (transactions), Next.js (SEO)
-- API-only → Fastify/Hono, consider Go for high load
-- Startup/MVP → Next.js + Prisma + Supabase (fast iteration)
+- Explain WHY you recommend each choice based on the specific project type
+- Skip categories that don't apply (e.g., no database for a CLI tool, no framework for a library)
 
 **Step 2: Create .ai-factory/DESCRIPTION.md**
 
@@ -281,7 +244,7 @@ Install skills, configure MCP, generate `AGENTS.md`, and generate architecture d
 I don't see an existing project here. Let's set one up!
 
 What kind of project are you building?
-(e.g., "e-commerce platform", "REST API for mobile app", "SaaS dashboard")
+(e.g., "CLI tool for file processing", "REST API", "mobile app", "data pipeline")
 
 > ___
 ```

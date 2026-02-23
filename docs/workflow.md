@@ -185,7 +185,7 @@ Second-pass analysis. Finds missing tasks (migrations, configs, middleware), fix
 ### `/aif-loop [new|resume|status|stop|list|history|clean] [task or alias]` — iterative quality loop
 
 ```
-/aif-loop new OpenAPI 3.1 + DDD notes + JSON examples + PHP controller
+/aif-loop new OpenAPI 3.1 spec + DDD notes + JSON examples
 /aif-loop resume
 /aif-loop status
 /aif-loop list

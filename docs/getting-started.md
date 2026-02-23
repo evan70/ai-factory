@@ -4,9 +4,9 @@
 
 ## What is AI Factory?
 
-AI Factory is a CLI tool and skill system that:
+AI Factory is a **stack-agnostic** CLI tool and skill system that works with any language, framework, or platform:
 
-1. **Analyzes your project** — detects tech stack from package.json, composer.json, requirements.txt, etc.
+1. **Analyzes your project** — understands your codebase structure and conventions
 2. **Installs relevant skills** — downloads from [skills.sh](https://skills.sh) or generates custom ones
 3. **Configures MCP servers** — GitHub, Postgres, Filesystem, Playwright based on your needs
 4. **Provides spec-driven workflow** — structured feature development with plans, tasks, and commits
@@ -44,7 +44,7 @@ npm install -g ai-factory
 # 2. Go to your project
 cd my-project
 
-# 3. Initialize — pick one or more agents, detect stack, install skills
+# 3. Initialize — pick agents, install skills, configure MCP
 ai-factory init
 
 # 4. Open your AI agent (Claude Code, Cursor, etc.) and run:

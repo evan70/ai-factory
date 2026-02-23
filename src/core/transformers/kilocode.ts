@@ -20,7 +20,7 @@ export class KiloCodeTransformer implements AgentTransformer {
       '1. Open Kilo Code in this directory',
       '2. Skills installed to .kilocode/skills/ (directory names use hyphens, not dots)',
       '3. MCP servers configured in .kilocode/mcp.json (if selected)',
-      '4. Run /aif to analyze project and generate stack-specific skills',
+      '4. Run /aif to analyze project and generate project-relevant skills',
     ];
   }
 }

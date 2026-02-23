@@ -18,7 +18,7 @@ ai-factory/
 ├── src/                    # CLI source (TypeScript)
 │   ├── cli/
 │   │   ├── commands/       # init.ts, update.ts, upgrade.ts
-│   │   └── wizard/         # prompts.ts, detector.ts
+│   │   └── wizard/         # prompts.ts
 │   ├── core/               # installer.ts, config.ts, mcp.ts, agents.ts, template.ts, transformer.ts
 │   │   └── transformers/   # default.ts, antigravity.ts, kilocode.ts
 │   └── utils/              # fs.ts
@@ -43,8 +43,7 @@ ai-factory/
 │   ├── aif-rules/              # Project rules and conventions
 │   ├── aif-security-checklist/ # Security audit
 │   ├── aif-skill-generator/    # Generate new skills
-│   ├── aif-verify/             # Verify implementation against plan
-│   └── _templates/                    # Stack-specific templates
+│   └── aif-verify/             # Verify implementation against plan
 ├── scripts/                # test-skills.sh
 ├── mcp/                    # MCP server templates
 ├── dist/                   # Compiled JS
@@ -234,11 +233,10 @@ ai-factory upgrade
 | File | Purpose |
 |------|---------|
 | `src/cli/index.ts` | CLI entry point, registers init/update/upgrade commands |
-| `src/cli/commands/init.ts` | Interactive wizard: detect stack, select skills, configure MCP |
+| `src/cli/commands/init.ts` | Interactive wizard: select agents, skills, configure MCP |
 | `src/cli/commands/update.ts` | Re-install all skills, preserve custom skills |
 | `src/cli/commands/upgrade.ts` | v1→v2 migration: remove old bare names, install prefixed |
 | `src/cli/wizard/prompts.ts` | Interactive CLI questions |
-| `src/cli/wizard/detector.ts` | Stack detection logic |
 | `src/core/agents.ts` | Agent registry (15 agents) |
 | `src/core/installer.ts` | Copies skills to project |
 | `src/core/mcp.ts` | MCP server configuration |

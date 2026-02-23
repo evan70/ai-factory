@@ -109,14 +109,14 @@ Format:
 
 ## CI/CD Integration
 
-Detect and provide commands for:
+Detect and provide commands for the project's deployment target:
 
-- **Vercel**: `vercel --prod`
-- **Netlify**: `netlify deploy --prod`
-- **Railway**: `railway up`
 - **Docker**: Build and push commands
 - **Kubernetes**: `kubectl apply` commands
 - **GitHub Actions**: Trigger workflow
+- **Cloud providers**: AWS, GCP, Azure CLI commands
+- **PaaS**: Railway, Fly.io, Render, Heroku
+- **Custom**: Any deployment script or CI/CD pipeline found in the project
 
 ## Safety Features
 

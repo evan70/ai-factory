@@ -190,7 +190,6 @@ export async function upgradeCommand(): Promise<void> {
       projectDir,
       skillsDir: agent.skillsDir,
       skills: availableSkills,
-      stack: null,
       agentId: agent.id,
     });
 

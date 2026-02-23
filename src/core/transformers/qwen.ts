@@ -19,7 +19,7 @@ export class QwenTransformer implements AgentTransformer {
     return [
       '1. Open Qwen Code in this directory',
       '2. MCP servers configured in .qwen/settings.json (if selected)',
-      '3. Run /skills aif to analyze project and generate stack-specific skills',
+      '3. Run /skills aif to analyze project and generate project-relevant skills',
     ];
   }
 

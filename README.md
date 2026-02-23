@@ -28,11 +28,11 @@ ai-factory init
 
 ## Why AI Factory?
 
-- **Zero configuration** — detects your stack, installs relevant skills, configures integrations
+- **Zero configuration** — installs relevant skills, configures integrations
 - **Best practices built-in** — logging, commits, code review, all following industry standards
 - **Spec-driven development** — AI follows plans, not random exploration. Predictable, resumable, reviewable
 - **Community skills** — leverage [skills.sh](https://skills.sh) ecosystem or generate custom skills
-- **Works with your stack** — Next.js, Laravel, Django, Express, and more
+- **Stack-agnostic** — works with any language, framework, or platform
 - **Multi-agent support** — Claude Code, Cursor, Windsurf, Roo Code, Kilo Code, Antigravity, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, Qwen Code, or [any agent](docs/getting-started.md#supported-agents)
 
 ---
@@ -60,7 +60,6 @@ ai-factory init
 
 This will:
 - Ask which AI agent you use
-- Detect your project stack
 - Install relevant skills
 - Configure MCP servers (for supported agents)
 

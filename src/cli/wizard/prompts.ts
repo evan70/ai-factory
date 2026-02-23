@@ -1,5 +1,4 @@
 import inquirer from 'inquirer';
-import { detectStack } from './detector.js';
 import { getAvailableSkills } from '../../core/installer.js';
 import { getAgentConfig, getAgentChoices } from '../../core/agents.js';
 
@@ -17,21 +16,11 @@ export interface WizardAnswers {
   agents: AgentWizardSelection[];
 }
 
-export async function runWizard(projectDir: string, defaultAgentIds: string[] = []): Promise<WizardAnswers> {
-  const detectedStack = await detectStack(projectDir);
+export async function runWizard(defaultAgentIds: string[] = []): Promise<WizardAnswers> {
   const availableSkills = await getAvailableSkills();
   const selectedByDefault = new Set(defaultAgentIds);
 
-  if (detectedStack) {
-    console.log(`\n📦 Detected: ${detectedStack.name}`);
-    if (detectedStack.frameworks.length > 0) {
-      console.log(`   Frameworks: ${detectedStack.frameworks.join(', ')}`);
-    }
-    console.log(`\n💡 Run /aif after setup to generate stack-specific skills.\n`);
-  } else {
-    console.log('\n📦 No existing project detected.');
-    console.log('💡 Run /aif after setup to analyze or describe your project.\n');
-  }
+  console.log('\n💡 Run /aif after setup to analyze your project and generate relevant skills.\n');
 
   const answers = await inquirer.prompt([
     {
@@ -84,9 +73,6 @@ export async function runWizard(projectDir: string, defaultAgentIds: string[] = 
       ]);
 
       if (configureMcp) {
-        const suggestPostgres = detectedStack?.name &&
-          ['laravel', 'symfony', 'django', 'fastapi', 'nextjs', 'node-api'].includes(detectedStack.name);
-
         mcpAnswers = await inquirer.prompt([
           {
             type: 'confirm',
@@ -97,7 +83,7 @@ export async function runWizard(projectDir: string, defaultAgentIds: string[] = 
           {
             type: 'confirm',
             name: 'mcpPostgres',
-            message: `[${agentConfig.displayName}] Postgres MCP (database queries)?${suggestPostgres ? ' (recommended for this stack)' : ''}`,
+            message: `[${agentConfig.displayName}] Postgres MCP (database queries)?`,
             default: false,
           },
           {

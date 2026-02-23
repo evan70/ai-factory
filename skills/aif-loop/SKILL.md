@@ -141,7 +141,7 @@ Generate:
   "phase": "A",
   "current_step": "PLAN",
   "task": {
-    "prompt": "OpenAPI 3.1 + DDD notes + JSON examples + PHP controller",
+    "prompt": "OpenAPI 3.1 spec + DDD notes + JSON examples",
     "ideal_result": "..."
   },
   "criteria": {
@@ -451,7 +451,7 @@ If `run.json` is missing or unparseable:
 ## Examples
 
 ```text
-/aif-loop new OpenAPI 3.1 + DDD notes + JSON examples + PHP controller
+/aif-loop new OpenAPI 3.1 spec + DDD notes + JSON examples
 /aif-loop resume
 /aif-loop resume courses-api-ddd
 /aif-loop status

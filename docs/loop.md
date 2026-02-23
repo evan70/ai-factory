@@ -85,8 +85,8 @@ Single source of truth for current state:
   "phase": "A",
   "current_step": "PLAN",
   "task": {
-    "prompt": "OpenAPI 3.1 + DDD notes + JSON examples + PHP controller",
-    "ideal_result": "Spec + notes + examples + controller pass phase B"
+    "prompt": "OpenAPI 3.1 spec + DDD notes + JSON examples",
+    "ideal_result": "Spec + notes + examples pass phase B"
   },
   "criteria": {
     "name": "loop_default_v1",

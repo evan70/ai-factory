@@ -9,7 +9,6 @@ export interface InstallOptions {
   projectDir: string;
   skillsDir: string;
   skills: string[];
-  stack: string | null;
   agentId: string;
 }
 
@@ -45,7 +44,7 @@ async function installSkillWithTransformer(
 }
 
 export async function installSkills(options: InstallOptions): Promise<string[]> {
-  const { projectDir, skillsDir, skills, stack, agentId } = options;
+  const { projectDir, skillsDir, skills, agentId } = options;
   const installedSkills: string[] = [];
   const agentConfig = getAgentConfig(agentId);
 
@@ -62,21 +61,6 @@ export async function installSkills(options: InstallOptions): Promise<string[]> 
       installedSkills.push(skill);
     } catch (error) {
       console.warn(`Warning: Could not install skill "${skill}": ${error}`);
-    }
-  }
-
-  if (stack) {
-    const templateDir = path.join(packageSkillsDir, '_templates', stack);
-    try {
-      const templateSkills = await listDirectories(templateDir);
-      for (const templateSkill of templateSkills) {
-        const sourceDir = path.join(templateDir, templateSkill);
-
-        await installSkillWithTransformer(sourceDir, templateSkill, projectDir, skillsDir, agentId, agentConfig);
-        installedSkills.push(`${stack}/${templateSkill}`);
-      }
-    } catch {
-      // Template not found, skip
     }
   }
 
@@ -161,7 +145,6 @@ export async function updateSkills(agentInstallation: AgentInstallation, project
     projectDir,
     skillsDir: agentInstallation.skillsDir,
     skills: availableSkills,
-    stack: null,
     agentId: agentInstallation.id,
   });
 
