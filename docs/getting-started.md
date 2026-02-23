@@ -8,7 +8,7 @@ AI Factory is a CLI tool and skill system that:
 
 1. **Analyzes your project** — detects tech stack from package.json, composer.json, requirements.txt, etc.
 2. **Installs relevant skills** — downloads from [skills.sh](https://skills.sh) or generates custom ones
-3. **Configures MCP servers** — GitHub, Postgres, Filesystem based on your needs
+3. **Configures MCP servers** — GitHub, Postgres, Filesystem, Playwright based on your needs
 4. **Provides spec-driven workflow** — structured feature development with plans, tasks, and commits
 
 ## Supported Agents

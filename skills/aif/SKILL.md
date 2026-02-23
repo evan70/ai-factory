@@ -344,6 +344,18 @@ Install skills, configure MCP, generate `AGENTS.md`, and generate architecture d
 }
 ```
 
+### Playwright
+**When:** Needs browser automation, web testing, interaction via accessibility tree
+
+```json
+{
+  "playwright": {
+    "command": "npx",
+    "args": ["-y", "@playwright/mcp@latest"]
+  }
+}
+```
+
 ---
 
 ## AGENTS.md Generation

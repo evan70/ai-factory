@@ -16,7 +16,8 @@
         "github": true,
         "postgres": false,
         "filesystem": false,
-        "chromeDevtools": false
+        "chromeDevtools": false,
+        "playwright": false
       }
     },
     {
@@ -27,7 +28,8 @@
         "github": false,
         "postgres": false,
         "filesystem": false,
-        "chromeDevtools": false
+        "chromeDevtools": false,
+        "playwright": false
       }
     }
   ],
@@ -55,6 +57,7 @@ AI Factory can configure these MCP servers:
 | Postgres | Database queries | `DATABASE_URL` |
 | Filesystem | Advanced file operations | - |
 | Chrome Devtools | Browser inspection, debugging, performance | - |
+| Playwright | Browser automation, web testing | - |
 
 Configuration saved to agent's settings file (e.g. `.mcp.json` for Claude Code, `.cursor/mcp.json` for Cursor, `.roo/mcp.json` for Roo Code, `.kilocode/mcp.json` for Kilo Code, `opencode.json` for OpenCode).
 

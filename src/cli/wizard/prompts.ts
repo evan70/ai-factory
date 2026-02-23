@@ -9,6 +9,7 @@ export interface AgentWizardSelection {
   mcpFilesystem: boolean;
   mcpPostgres: boolean;
   mcpChromeDevtools: boolean;
+  mcpPlaywright: boolean;
 }
 
 export interface WizardAnswers {
@@ -69,6 +70,7 @@ export async function runWizard(projectDir: string, defaultAgentIds: string[] = 
       mcpFilesystem: false,
       mcpPostgres: false,
       mcpChromeDevtools: false,
+      mcpPlaywright: false,
     };
 
     if (agentConfig.supportsMcp) {
@@ -108,6 +110,12 @@ export async function runWizard(projectDir: string, defaultAgentIds: string[] = 
             type: 'confirm',
             name: 'mcpChromeDevtools',
             message: `[${agentConfig.displayName}] Chrome Devtools MCP (inspect, debug, performance insights, analyze network requests)?`,
+            default: false,
+          },
+          {
+            type: 'confirm',
+            name: 'mcpPlaywright',
+            message: `[${agentConfig.displayName}] Playwright MCP (browser automation, web testing, interaction via accessibility tree)?`,
             default: false,
           },
         ]);

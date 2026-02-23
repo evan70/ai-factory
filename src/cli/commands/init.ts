@@ -63,6 +63,7 @@ export async function initCommand(): Promise<void> {
         filesystem: agentSelection.mcpFilesystem,
         postgres: agentSelection.mcpPostgres,
         chromeDevtools: agentSelection.mcpChromeDevtools,
+        playwright: agentSelection.mcpPlaywright,
       }, agentSelection.id);
 
       if (configuredMcp.length > 0) {
@@ -78,6 +79,7 @@ export async function initCommand(): Promise<void> {
           filesystem: agentSelection.mcpFilesystem,
           postgres: agentSelection.mcpPostgres,
           chromeDevtools: agentSelection.mcpChromeDevtools,
+          playwright: agentSelection.mcpPlaywright,
         },
       });
     }

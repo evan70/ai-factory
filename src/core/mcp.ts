@@ -19,6 +19,7 @@ export interface McpOptions {
   filesystem: boolean;
   postgres: boolean;
   chromeDevtools: boolean;
+  playwright: boolean;
 }
 
 type McpSettingsFormat = 'standard' | 'opencode';
@@ -58,6 +59,11 @@ const MCP_SERVERS: McpServerDefinition[] = [
     key: 'chromeDevtools',
     templateFile: 'chrome-devtools.json',
     instruction: 'Chrome Devtools MCP: No additional configuration needed. Server provides your coding agent control and inspect a live Chrome browser.',
+  },
+  {
+    key: 'playwright',
+    templateFile: 'playwright.json',
+    instruction: 'Playwright MCP: No additional configuration needed. Server provides browser automation via accessibility tree for web testing and interaction.',
   },
 ];
 

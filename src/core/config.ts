@@ -11,6 +11,7 @@ export interface McpConfig {
   filesystem: boolean;
   postgres: boolean;
   chromeDevtools: boolean;
+  playwright: boolean;
 }
 
 export interface AgentInstallation {
@@ -53,6 +54,7 @@ function normalizeMcp(mcp?: Partial<McpConfig>): McpConfig {
     filesystem: mcp?.filesystem ?? false,
     postgres: mcp?.postgres ?? false,
     chromeDevtools: mcp?.chromeDevtools ?? false,
+    playwright: mcp?.playwright ?? false,
   };
 }
 
