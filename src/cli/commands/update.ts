@@ -32,8 +32,13 @@ export async function updateCommand(): Promise<void> {
       previousBaseSkillsByAgent.set(agent.id, previousBaseSkills);
       const newSkills = availableSkills.filter(s => !previousBaseSkills.includes(s));
 
+      const removedSkills = previousBaseSkills.filter(s => !availableSkills.includes(s));
+
       if (newSkills.length > 0) {
         console.log(chalk.cyan(`📦 [${agent.id}] New skills available: ${newSkills.join(', ')}`));
+      }
+      if (removedSkills.length > 0) {
+        console.log(chalk.yellow(`🗑️  [${agent.id}] Removed skills: ${removedSkills.join(', ')}`));
       }
     }
     if (config.agents.length > 0) {

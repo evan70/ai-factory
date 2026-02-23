@@ -27,7 +27,6 @@ export interface AgentOnboarding {
 export const WORKFLOW_SKILLS = new Set([
   'aif',
   'aif-commit',
-  'aif-deploy',
   'aif-fix',
   'aif-implement',
   'aif-improve',

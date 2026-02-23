@@ -13,7 +13,6 @@ const OLD_SKILL_NAMES = [
   'build-automation',
   'ci',
   'commit',
-  'deploy',
   'dockerize',
   'docs',
   'evolve',
@@ -36,7 +35,6 @@ const OLD_AIF_PREFIX_SKILL_NAMES = [
   'ai-factory-build-automation',
   'ai-factory-ci',
   'ai-factory-commit',
-  'ai-factory-deploy',
   'ai-factory-dockerize',
   'ai-factory-docs',
   'ai-factory-evolve',
@@ -58,7 +56,6 @@ const OLD_AIF_PREFIX_SKILL_NAMES = [
 // Old workflow skills stored as flat .md files by Antigravity transformer
 const OLD_WORKFLOW_SKILLS = new Set([
   'commit',
-  'deploy',
   'feature',
   'fix',
   'implement',

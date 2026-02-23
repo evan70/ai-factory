@@ -29,7 +29,6 @@ ai-factory/
 │   ├── aif-build-automation/   # Makefile/Taskfile/Justfile generator
 │   ├── aif-ci/                 # GitHub Actions / GitLab CI generator
 │   ├── aif-commit/             # Conventional commits
-│   ├── aif-deploy/             # Deployment helper
 │   ├── aif-dockerize/          # Docker/compose generator
 │   ├── aif-docs/               # Documentation generation & maintenance
 │   ├── aif-evolve/             # Self-improve skills based on context
@@ -196,7 +195,7 @@ Saves evolution log to .ai-factory/evolutions/
 disable-model-invocation: true  # User must invoke explicitly
 allowed-tools: Bash(git *) Write Edit
 ```
-Used by: plan, implement, commit, deploy
+Used by: plan, implement, commit
 
 ### Reference skills (model + user)
 ```yaml

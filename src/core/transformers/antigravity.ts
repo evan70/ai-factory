@@ -63,7 +63,6 @@ Action-oriented skills that execute specific tasks:
 - \`aif-implement.md\` — Execute plans step by step
 - \`aif-commit.md\` — Create conventional commits
 - \`aif-review.md\` — Code review checklist
-- \`aif-deploy.md\` — Deployment automation
 - \`aif-ci.md\` — CI/CD pipeline setup
 
 ### Skills (.agent/skills/)

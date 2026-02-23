@@ -108,17 +108,16 @@ export async function installExtensionSkills(
   return installed;
 }
 
-export async function removeExtensionSkills(
+async function removeSkillsByName(
   projectDir: string,
   agentInstallation: AgentInstallation,
-  skillPaths: string[],
+  skillNames: string[],
 ): Promise<string[]> {
   const agentConfig = getAgentConfig(agentInstallation.id);
   const transformer = getTransformer(agentInstallation.id);
   const removed: string[] = [];
 
-  for (const skillPath of skillPaths) {
-    const skillName = path.basename(skillPath);
+  for (const skillName of skillNames) {
     try {
       const result = transformer.transform(skillName, '');
       if (result.flat) {
@@ -137,9 +136,23 @@ export async function removeExtensionSkills(
   return removed;
 }
 
+export async function removeExtensionSkills(
+  projectDir: string,
+  agentInstallation: AgentInstallation,
+  skillPaths: string[],
+): Promise<string[]> {
+  return removeSkillsByName(projectDir, agentInstallation, skillPaths.map(p => path.basename(p)));
+}
+
 export async function updateSkills(agentInstallation: AgentInstallation, projectDir: string): Promise<string[]> {
   const availableSkills = await getAvailableSkills();
-  const { custom } = partitionSkills(agentInstallation.installedSkills);
+  const { base: previousBaseSkills, custom } = partitionSkills(agentInstallation.installedSkills);
+  const availableSet = new Set(availableSkills);
+
+  const removedSkills = previousBaseSkills.filter(s => !availableSet.has(s));
+  if (removedSkills.length > 0) {
+    await removeSkillsByName(projectDir, agentInstallation, removedSkills);
+  }
 
   const installedBaseSkills = await installSkills({
     projectDir,
