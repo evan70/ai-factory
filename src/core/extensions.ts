@@ -203,17 +203,6 @@ export async function commitExtensionInstall(projectDir: string, resolved: Resol
   }
 }
 
-// Legacy one-shot install (resolve + commit). Kept for backward compatibility.
-export async function installExtension(projectDir: string, source: string): Promise<ExtensionManifest> {
-  const resolved = await resolveExtension(projectDir, source);
-  try {
-    await commitExtensionInstall(projectDir, resolved);
-    return resolved.manifest;
-  } finally {
-    await resolved.cleanup();
-  }
-}
-
 export async function removeExtensionFiles(projectDir: string, name: string): Promise<void> {
   validateExtensionName(name);
   const targetDir = path.join(getExtensionsDir(projectDir), name);

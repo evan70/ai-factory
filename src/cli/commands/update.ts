@@ -1,9 +1,14 @@
 import chalk from 'chalk';
 import path from 'path';
 import {getCurrentVersion, loadConfig, saveConfig} from '../../core/config.js';
-import {getAvailableSkills, partitionSkills, updateSkills, installExtensionSkills, installSkills} from '../../core/installer.js';
+import {getAvailableSkills, partitionSkills, updateSkills} from '../../core/installer.js';
 import {applyExtensionInjections} from '../../core/injections.js';
 import {getExtensionsDir, loadExtensionManifest} from '../../core/extensions.js';
+import {
+  installExtensionSkillsForAllAgents,
+  installSkillsForAllAgents,
+  collectReplacedSkills,
+} from '../../core/extension-ops.js';
 
 export async function updateCommand(): Promise<void> {
   const projectDir = process.cwd();
@@ -48,13 +53,8 @@ export async function updateCommand(): Promise<void> {
     }
 
     // Collect all replaced skills from extensions
-    const allReplacedSkills = new Set<string>();
     const extensions = config.extensions ?? [];
-    for (const ext of extensions) {
-      if (ext.replacedSkills?.length) {
-        for (const s of ext.replacedSkills) allReplacedSkills.add(s);
-      }
-    }
+    const allReplacedSkills = collectReplacedSkills(extensions);
 
     if (allReplacedSkills.size > 0) {
       console.log(chalk.dim(`Skipping replaced skills: ${[...allReplacedSkills].join(', ')}`));
@@ -93,8 +93,22 @@ export async function updateCommand(): Promise<void> {
       }
 
       if (replacePaths.length > 0) {
-        for (const agent of config.agents) {
-          await installExtensionSkills(projectDir, agent, extensionDir, replacePaths, nameOverrides);
+        const results = await installExtensionSkillsForAllAgents(projectDir, config.agents, extensionDir, replacePaths, nameOverrides);
+
+        // Detect replacements that failed to install on all agents
+        const agentCount = config.agents.length;
+        for (const [extPath, baseSkill] of Object.entries(manifest.replaces)) {
+          if (!ext.replacedSkills!.includes(baseSkill)) continue;
+          if (!replacePaths.includes(extPath)) continue;
+          let successCount = 0;
+          for (const installed of results.values()) {
+            if (installed.includes(baseSkill)) successCount++;
+          }
+          if (successCount < agentCount) {
+            console.log(chalk.yellow(`⚠ Extension "${ext.name}" replacement "${baseSkill}" failed to install — restoring base skill`));
+            failedReplacements.push(baseSkill);
+            ext.replacedSkills = ext.replacedSkills!.filter(s => s !== baseSkill);
+          }
         }
       }
     }
@@ -102,22 +116,10 @@ export async function updateCommand(): Promise<void> {
     // Install base skills that couldn't be replaced due to broken extensions
     // But only if no other extension still replaces them
     if (failedReplacements.length > 0) {
-      const stillReplacedByOthers = new Set<string>();
-      for (const ext of extensions) {
-        if (ext.replacedSkills?.length) {
-          for (const s of ext.replacedSkills) stillReplacedByOthers.add(s);
-        }
-      }
+      const stillReplacedByOthers = collectReplacedSkills(extensions);
       const toRestore = failedReplacements.filter(s => !stillReplacedByOthers.has(s));
       if (toRestore.length > 0) {
-        for (const agent of config.agents) {
-          await installSkills({
-            projectDir,
-            skillsDir: agent.skillsDir,
-            skills: toRestore,
-            agentId: agent.id,
-          });
-        }
+        await installSkillsForAllAgents(projectDir, config.agents, toRestore);
       }
     }
 
