@@ -51,7 +51,8 @@
   ],
   "knip": {
     "ignoreExportsUsedInFile": true,
-    "exclude": ["types"]
+    "exclude": ["types"],
+    "ignore": ["examples/**"]
   },
   "engines": {
     "node": ">=18.0.0"
