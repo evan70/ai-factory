@@ -210,6 +210,24 @@ else
 fi
 
 # ─────────────────────────────────────────────
+# Part 4: Internal security self-scan
+# ─────────────────────────────────────────────
+echo -e "\n${BOLD}=== Internal security self-scan ===${NC}\n"
+
+set +e
+SELF_SCAN_OUTPUT=$(bash "$ROOT_DIR/scripts/security-self-scan.sh" 2>&1)
+SELF_SCAN_EXIT=$?
+set -e
+
+if [[ $SELF_SCAN_EXIT -eq 0 ]]; then
+    pass "self-scan passed (no critical threats after allowlist)"
+    echo "$SELF_SCAN_OUTPUT" | grep -E 'Critical:|Warnings:|Ignored by allowlist' | sed 's/^/      /' || true
+else
+    fail "self-scan failed (critical threats or scanner error)"
+    echo "$SELF_SCAN_OUTPUT" | sed 's/^/      /'
+fi
+
+# ─────────────────────────────────────────────
 # Summary
 # ─────────────────────────────────────────────
 echo -e "\n${BOLD}=== Results ===${NC}"

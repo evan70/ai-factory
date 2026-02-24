@@ -74,6 +74,9 @@ A skill with **any CRITICAL threat is never installed**. No exceptions, no overr
 # Scan a skill directory (use your agent's skills path)
 python3 .claude/skills/aif-skill-generator/scripts/security-scan.py ./my-downloaded-skill/
 
+# Strict mode: code block examples are treated as real threats (no demotion)
+python3 .claude/skills/aif-skill-generator/scripts/security-scan.py --strict ./my-downloaded-skill/
+
 # Scan a single SKILL.md file
 python3 .claude/skills/aif-skill-generator/scripts/security-scan.py ./my-skill/SKILL.md
 
@@ -81,6 +84,22 @@ python3 .claude/skills/aif-skill-generator/scripts/security-scan.py ./my-skill/S
 # python3 .codex/skills/aif-skill-generator/scripts/security-scan.py ./my-skill/
 # python3 .agents/skills/aif-skill-generator/scripts/security-scan.py ./my-skill/
 ```
+
+## Internal Self-Scan (AI Factory repo)
+
+Built-in AI Factory skills contain security threat examples in documentation, which can trigger expected false positives.
+For repository self-audits, use the internal allowlist:
+
+```bash
+./scripts/security-self-scan.sh
+# or:
+# python3 skills/aif-skill-generator/scripts/security-scan.py \
+#   --md-only \
+#   --allowlist scripts/security-scan-allowlist-ai-factory.json \
+#   skills/
+```
+
+Use `--allowlist` only for trusted first-party content. Do not use it when scanning external downloaded skills.
 
 ## See Also
 

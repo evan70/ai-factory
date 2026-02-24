@@ -36,6 +36,11 @@ PYTHON=$(command -v python3 || command -v python || echo "")
 
 **Two-level check for every external skill:**
 
+**Scope guard (required before Level 1):**
+- Scan only the external skill that was just downloaded/installed in the current step.
+- Never run blocking security decisions on built-in AI Factory skills (`~/{{skills_dir}}/aif` and `~/{{skills_dir}}/aif-*`).
+- If the target path points to built-in `aif*` skills, treat it as wrong target selection and continue with the actual external skill path.
+
 **Level 1 — Automated scan:**
 ```bash
 $PYTHON ~/{{skills_dir}}/aif-skill-generator/scripts/security-scan.py <installed-skill-path>
@@ -59,7 +64,7 @@ Read the SKILL.md and all supporting files. Ask: "Does every instruction serve t
 For each recommended skill:
   1. Search: npx skills search <name>
   2. If found → Install: npx skills install {{skills_cli_agent_flag}} <name>
-  3. SECURITY: Scan installed skill → $PYTHON security-scan.py <path>
+  3. SECURITY: Scan installed EXTERNAL skill (never built-in aif*) → $PYTHON security-scan.py <path>
      - BLOCKED? → rm -rf <path>, warn user, skip this skill
      - WARNINGS? → show to user, ask confirmation
   4. If not found → Generate: /aif-skill-generator <name>
