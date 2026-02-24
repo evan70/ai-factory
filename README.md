@@ -32,8 +32,8 @@ ai-factory init
 - **Best practices built-in** — logging, commits, code review, all following industry standards
 - **Spec-driven development** — AI follows plans, not random exploration. Predictable, resumable, reviewable
 - **Community skills** — leverage [skills.sh](https://skills.sh) ecosystem or generate custom skills
-- **Stack-agnostic** — works with any language, framework, or platform
-- **Multi-agent support** — Claude Code, Cursor, Windsurf, Roo Code, Kilo Code, Antigravity, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, Qwen Code, or [any agent](docs/getting-started.md#supported-agents)
+- **Stack-agnostic** — works with any language, framework or platform
+- **Multi-agent support** — Claude Code, Cursor, Windsurf, Roo Code, Kilo Code, Antigravity, OpenCode, Warp, Zencoder, Codex CLI, GitHub Copilot, Gemini CLI, Junie, Qwen Code or [any agent](docs/getting-started.md#supported-agents)
 
 ---
 
