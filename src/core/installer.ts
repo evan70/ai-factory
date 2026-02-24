@@ -1,5 +1,5 @@
 import path from 'path';
-import { copyDirectory, getSkillsDir, ensureDir, listDirectories, readTextFile, writeTextFile, removeDirectory } from '../utils/fs.js';
+import { copyDirectory, getSkillsDir, ensureDir, listDirectories, readTextFile, writeTextFile, removeDirectory, fileExists } from '../utils/fs.js';
 import type { AgentInstallation } from './config.js';
 import { getAgentConfig } from './agents.js';
 import { processSkillTemplates, buildTemplateVars, processTemplate } from './template.js';
@@ -37,6 +37,13 @@ async function installSkillWithTransformer(
   if (result.flat) {
     const targetPath = path.join(projectDir, agentConfig.configDir, result.targetDir, result.targetName);
     await writeTextFile(targetPath, processTemplate(result.content, vars));
+
+    // Copy references directory if it exists in the source skill
+    const sourceRefsDir = path.join(sourceSkillDir, 'references');
+    if (await fileExists(sourceRefsDir)) {
+      const targetRefsDir = path.join(projectDir, agentConfig.configDir, result.targetDir, 'references');
+      await copyDirectory(sourceRefsDir, targetRefsDir);
+    }
   } else {
     const targetSkillDir = path.join(projectDir, skillsDir, result.targetDir);
     await copyDirectory(sourceSkillDir, targetSkillDir);
